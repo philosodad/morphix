@@ -1,0 +1,1 @@
+sidebarNodes={"exceptions":[],"extras":[{"id":"extra-api-reference","title":"API Reference","headers":[]}],"modules":[{"id":"Mogrexfy","title":"Mogrexfy","functions":[{"id":"atomogriform/1","anchor":"atomogriform/1"},{"id":"atomogrify/1","anchor":"atomogrify/1"},{"id":"mogriflat/1","anchor":"mogriflat/1"}]}],"protocols":[]}

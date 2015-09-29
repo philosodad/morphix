@@ -1,12 +1,16 @@
 defmodule Mogrexfy do
   @doc """
-  mogriflat(map)
+  Takes a map and returns a flattened version of that map. If the map has nested maps (or the maps nested maps have nested maps, etc.) mogriflat moves all nested key/value pairs to the top level, discarding the original keys.
 
-  Flattens a map into another map. If the map has nested maps, then the key to the nested map is discarded and the inner map is also flattened.
+  ### Examples:
 
-  #Examples:
+  ```
   iex> Mogrexfy.mogriflat %{this: %{nested: :map, inner: %{twonested: :map, is: "now flat"}}}
   {:ok, %{nested: :map, twonested: :map, is: "now flat"}}
+
+  ```
+
+  In the example, the key `:this` is discarded, along with the key `inner`, because they both point to map values.
   """
   def mogriflat( map ) when is_map map do
     {:ok, flattn map}
@@ -14,11 +18,12 @@ defmodule Mogrexfy do
 
 
   @doc """
-  atomogrify(map)
 
-  If the map has string keys, converts them to symbols. Will not alter nested maps and ignores non-string keys, will overwrite duplicates.
+  Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps.
 
-  #Examples
+  ### Examples
+
+  ```
   iex> Mogrexfy.atomogrify(%{"this" => "map", "has" => %{"string" => "keys"}})
   {:ok, %{this: "map", has: %{"string" => "keys"}}}
 
@@ -27,40 +32,44 @@ defmodule Mogrexfy do
 
   iex> Mogrexfy.atomogrify(%{"a" => "2", :a => 2, 'a'  => :two})
   {:ok, %{:a => 2, 'a' => :two }}
+
+  ```
   """
   def atomogrify(map) when is_map map do
     {:ok, atomog map}
   end
 
   @doc """
-  atomogriform(map) 
+  Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys.
 
-  converts nested strings to keys at any level.
+  ### Examples:
 
-  Examples:
+  ```
   iex> Mogrexfy.atomogriform(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
   {:ok,%{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"} }
+
+  ```
   """
   def atomogriform(map) do
     {:ok, depth_atomog(map)}
   end
 
   defp depth_atomog (map) do
-    symkeys = fn({k, v}, acc) -> 
+    atomkeys = fn({k, v}, acc) -> 
       if is_map v do
         Map.put_new(acc, atomize_binary(k), depth_atomog(v))
       else 
         Map.put_new(acc, atomize_binary(k), v) 
       end
     end
-    Enum.reduce(map, %{}, symkeys)
+    Enum.reduce(map, %{}, atomkeys)
   end
 
   defp atomog (map) do
-    symkeys = fn({k, v}, acc) ->
+    atomkeys = fn({k, v}, acc) ->
       Map.put_new(acc, atomize_binary(k), v)
     end
-    Enum.reduce(map, %{}, symkeys)
+    Enum.reduce(map, %{}, atomkeys)
   end
 
   defp atomize_binary(value) do 
