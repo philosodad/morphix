@@ -1,18 +1,18 @@
-defmodule Mogrexfy do
+defmodule Morphix do
   @doc """
-  Takes a map and returns a flattened version of that map. If the map has nested maps (or the maps nested maps have nested maps, etc.) mogriflat moves all nested key/value pairs to the top level, discarding the original keys.
+  Takes a map and returns a flattened version of that map. If the map has nested maps (or the maps nested maps have nested maps, etc.) morphiflat moves all nested key/value pairs to the top level, discarding the original keys.
 
   ### Examples:
 
   ```
-  iex> Mogrexfy.mogriflat %{this: %{nested: :map, inner: %{twonested: :map, is: "now flat"}}}
+  iex> Morphix.morphiflat %{this: %{nested: :map, inner: %{twonested: :map, is: "now flat"}}}
   {:ok, %{nested: :map, twonested: :map, is: "now flat"}}
 
   ```
 
   In the example, the key `:this` is discarded, along with the key `inner`, because they both point to map values.
   """
-  def mogriflat( map ) when is_map map do
+  def morphiflat( map ) when is_map map do
     {:ok, flattn map}
   end
 
@@ -24,18 +24,18 @@ defmodule Mogrexfy do
   ### Examples
 
   ```
-  iex> Mogrexfy.atomogrify(%{"this" => "map", "has" => %{"string" => "keys"}})
+  iex> Morphix.atomorphify(%{"this" => "map", "has" => %{"string" => "keys"}})
   {:ok, %{this: "map", has: %{"string" => "keys"}}}
 
-  iex> Mogrexfy.atomogrify(%{1 => "2", "1" => 2, "one" => :two})
+  iex> Morphix.atomorphify(%{1 => "2", "1" => 2, "one" => :two})
   {:ok, %{1 => "2", "1": 2, one: :two}}
 
-  iex> Mogrexfy.atomogrify(%{"a" => "2", :a => 2, 'a'  => :two})
+  iex> Morphix.atomorphify(%{"a" => "2", :a => 2, 'a'  => :two})
   {:ok, %{:a => 2, 'a' => :two }}
 
   ```
   """
-  def atomogrify(map) when is_map map do
+  def atomorphify(map) when is_map map do
     {:ok, atomog map}
   end
 
@@ -45,12 +45,12 @@ defmodule Mogrexfy do
   ### Examples:
 
   ```
-  iex> Mogrexfy.atomogriform(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
+  iex> Morphix.atomorphiform(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
   {:ok,%{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"} }
 
   ```
   """
-  def atomogriform(map) do
+  def atomorphiform(map) do
     {:ok, depth_atomog(map)}
   end
 
