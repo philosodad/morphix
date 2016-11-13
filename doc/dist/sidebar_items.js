@@ -1,0 +1,1 @@
+sidebarNodes={"exceptions":[],"extras":[{"id":"api-reference","title":"API Reference","group":"","headers":[{"id":"Modules","anchor":"modules"}]}],"modules":[{"id":"Morphix","title":"Morphix","functions":[{"id":"atomorphiform/1","anchor":"atomorphiform/1"},{"id":"atomorphify/1","anchor":"atomorphify/1"},{"id":"morphiflat/1","anchor":"morphiflat/1"}]}],"protocols":[]}
