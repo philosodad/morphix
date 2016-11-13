@@ -28,8 +28,8 @@ defmodule Morphix.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:earmark, "~> 0.1.17"},
-     { :ex_doc, "~> 0.7", only: :dev},
-     { :excoveralls, "~> 0.3", only: [:dev, :test]}]
+    [ 
+      {:excoveralls, "~> 0.3", only: [:dev, :test]}
+    ]
   end
 end
