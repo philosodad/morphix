@@ -1,4 +1,4 @@
-# mogrexfy
+# morphix
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/philosodad/morphix/master/LICENSE)
 [![Travis](https://img.shields.io/travis/philosodad/morphix.svg)](https://travis-ci.org/philosodad/morphix)
