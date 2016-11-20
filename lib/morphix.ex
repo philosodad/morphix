@@ -48,18 +48,32 @@ defmodule Morphix do
   iex> Morphix.atomorphiform(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
   {:ok,%{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"} }
 
+  iex> Morphix.atomorphiform(%{"this" => ["map", %{"has" => ["a", "list"]}], "inside" => "it"})
+  {:ok, %{this: ["map", %{has: ["a", "list"]}], inside: "it"}}
+
   ```
   """
   def atomorphiform(map) do
     {:ok, depth_atomog(map)}
   end
 
+  defp process_list_item(item) do
+    cond do
+      is_map item -> depth_atomog(item)
+      is_list item -> Enum.map(item, fn(x) -> process_list_item(x) end)
+      true -> item
+    end
+  end
+
   defp depth_atomog (map) do
     atomkeys = fn({k, v}, acc) -> 
-      if is_map v do
-        Map.put_new(acc, atomize_binary(k), depth_atomog(v))
-      else 
-        Map.put_new(acc, atomize_binary(k), v) 
+      cond do
+        is_map v ->
+          Map.put_new(acc, atomize_binary(k), depth_atomog(v))
+        is_list v ->
+          Map.put_new(acc, atomize_binary(k), process_list_item(v))
+        true ->
+          Map.put_new(acc, atomize_binary(k), v)
       end
     end
     Enum.reduce(map, %{}, atomkeys)
