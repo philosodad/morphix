@@ -4,7 +4,7 @@ defmodule Morphix.Mixfile do
   def project do
     [
       app: :morphix,
-      version: "0.0.2",
+      version: "0.0.3",
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -33,7 +33,7 @@ defmodule Morphix.Mixfile do
 
   defp description do
     """
-    Morphix is a small package of convenience methods for working with Maps.
+    Morphix is a small package of convenience methods for working with Maps, Tuples, and Lists.
     """
   end
   # Dependencies can be Hex packages:
@@ -46,9 +46,10 @@ defmodule Morphix.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [ 
+    [
       {:excoveralls, "~> 0.3", only: [:dev, :test]},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:credo, "0.5.0", only: [:dev, :test]}
     ]
   end
 end

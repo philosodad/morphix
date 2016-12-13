@@ -5,10 +5,8 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.3">
-    <title>Morphix – morphix v0.0.1</title>
+    <title>Morphix – morphix v0.0.3</title>
     <link rel="stylesheet" href="dist/app-091c05798a.css" />
-    
-      <link rel="canonical" href="https://hexdocs.pm/morphix/Morphix.html" />
     
     <script src="dist/sidebar_items.js"></script>
   </head>
@@ -28,7 +26,7 @@
         morphix
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.1
+        v0.0.3
       </h2>
     </div>
     
@@ -60,12 +58,36 @@
 
 
       <h1>
-        <small class="visible-xs">morphix v0.0.1</small>
+        <small class="visible-xs">morphix v0.0.3</small>
         Morphix
         
         
       </h1>
 
+      
+        <section id="moduledoc">
+          <p>Morphix provides convenience methods for dealing with Maps, Lists, and Tuples. </p>
+<p><code class="inline">morphiflat</code> and <code class="inline">morphiflat!</code> flatten maps, discarding top level keys.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.morphiflat %{flatten: %{this: &quot;map&quot;}, if: &quot;you please&quot;}
+{:ok, %{this: &quot;map&quot;, if: &quot;you please&quot;}}
+
+
+iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot;}
+%{this: &quot;map&quot;, o: &quot;k&quot;}
+</code></pre>
+<p><code class="inline">morphify!</code> and <code class="inline">morphify</code> will take either a List or a Tuple as the first argument, and a function as the second. Returns a map, with the keys of the map being the function applied to each member of the input. </p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.morphify!({[1,2,3], [12], [1,2,3,4]}, &amp;length/1)
+%{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}
+</code></pre>
+<p><code class="inline">atomorphify</code> and <code class="inline">atomorphiform</code> take a map as an input and return the map with all string keys converted to atoms. <code class="inline">atomorphiform</code> is recursive.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.atomorphify(%{&quot;a&quot; =&gt; &quot;2&quot;, :a =&gt; 2, &#39;a&#39;  =&gt; :two})
+{:ok, %{:a =&gt; 2, &#39;a&#39; =&gt; :two }}
+</code></pre>
+
+        </section>
       
 
       
@@ -110,6 +132,33 @@
 </div>
   
 </div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#morphiflat!/1">morphiflat!(map)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a map and returns a flattend version of that map, discarding any nested keys</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#morphify/2">morphify(enum, funct)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a List and a function as arguments and returns <code class="inline">{:ok, Map}</code>, with the keys of the map the result of applying the function to each item in the list</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#morphify!/2">morphify!(enum, funct)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a list and a function as arguments and returns a Map, with the keys of the map the result of applying the function to each item in the list</p>
+</div>
+  
+</div>
 
   </div>
 
@@ -141,12 +190,21 @@
     
     
     
+      <div class="specs">
+        
+          <pre>atomorphiform(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: {:ok, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>}</pre>
+        
+      </div>
+    
   </div>
   <section class="docstring">
     <p>Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys.</p>
 <h3>Examples:</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.atomorphiform(%{:this =&gt; %{map: %{&quot;has&quot; =&gt; &quot;a&quot;, :nested =&gt; &quot;string&quot;, :for =&gt;  %{a: :key}}}, &quot;the&quot; =&gt;  %{&quot;other&quot; =&gt; %{map: :does}}, as: &quot;well&quot;})
 {:ok,%{this: %{map: %{has: &quot;a&quot;, nested: &quot;string&quot;, for: %{a: :key}}}, the: %{other: %{map: :does}}, as: &quot;well&quot;} }
+
+iex&gt; Morphix.atomorphiform(%{&quot;this&quot; =&gt; [&quot;map&quot;, %{&quot;has&quot; =&gt; [&quot;a&quot;, &quot;list&quot;]}], &quot;inside&quot; =&gt; &quot;it&quot;})
+{:ok, %{this: [&quot;map&quot;, %{has: [&quot;a&quot;, &quot;list&quot;]}], inside: &quot;it&quot;}}
 </code></pre>
 
   </section>
@@ -161,6 +219,12 @@
     
     
     
+      <div class="specs">
+        
+          <pre>atomorphify(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: {:ok, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>}</pre>
+        
+      </div>
+    
   </div>
   <section class="docstring">
     <p>Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps.</p>
@@ -170,9 +234,6 @@
 
 iex&gt; Morphix.atomorphify(%{1 =&gt; &quot;2&quot;, &quot;1&quot; =&gt; 2, &quot;one&quot; =&gt; :two})
 {:ok, %{1 =&gt; &quot;2&quot;, &quot;1&quot;: 2, one: :two}}
-
-iex&gt; Morphix.atomorphify(%{&quot;a&quot; =&gt; &quot;2&quot;, :a =&gt; 2, &#39;a&#39;  =&gt; :two})
-{:ok, %{:a =&gt; 2, &#39;a&#39; =&gt; :two }}
 </code></pre>
 
   </section>
@@ -187,6 +248,12 @@ iex&gt; Morphix.atomorphify(%{&quot;a&quot; =&gt; &quot;2&quot;, :a =&gt; 2, &#3
     
     
     
+      <div class="specs">
+        
+          <pre>morphiflat(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: {:ok | :error, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a> | String}</pre>
+        
+      </div>
+    
   </div>
   <section class="docstring">
     <p>Takes a map and returns a flattened version of that map. If the map has nested maps (or the maps nested maps have nested maps, etc.) morphiflat moves all nested key/value pairs to the top level, discarding the original keys.</p>
@@ -195,6 +262,101 @@ iex&gt; Morphix.atomorphify(%{&quot;a&quot; =&gt; &quot;2&quot;, :a =&gt; 2, &#3
 {:ok, %{nested: :map, twonested: :map, is: &quot;now flat&quot;}}
 </code></pre>
 <p>In the example, the key <code class="inline">:this</code> is discarded, along with the key <code class="inline">inner</code>, because they both point to map values.</p>
+<p>Will return <code class="inline">{:error, &lt;input&gt; is not a Map}</code> if the input is not a map.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.morphiflat({1,2,3})
+{:error, &quot;{1, 2, 3} is not a Map&quot;}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="morphiflat!/1">
+  
+  <div class="detail-header">
+    <a href="#morphiflat!/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">morphiflat!(map)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>morphiflat!(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map and returns a flattend version of that map, discarding any nested keys.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.morphiflat! %{you: &quot;will&quot;, youwill: %{be: &quot;discarded&quot;}}
+%{you: &quot;will&quot;, be: &quot;discarded&quot;}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="morphify/2">
+  
+  <div class="detail-header">
+    <a href="#morphify/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">morphify(enum, funct)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>morphify(<a href="http://elixir-lang.org/docs/stable/elixir/List.html#t:t/0">List.t</a>, Function) :: {:ok | :error, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a> | String}</pre>
+        
+          <pre>morphify(<a href="http://elixir-lang.org/docs/stable/elixir/Tuple.html#t:t/0">Tuple.t</a>, Function) :: {:ok | :error, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a> | String}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a List and a function as arguments and returns <code class="inline">{:ok, Map}</code>, with the keys of the map the result of applying the function to each item in the list.</p>
+<p>If the function cannot be applied, will return <code class="inline">{:error, message}</code></p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.morphify([[1,2,3], [12], [1,2,3,4]], &amp;Enum.count/1)
+{:ok, %{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}}
+
+
+iex&gt; Morphix.morphify({[1,2,3], [12], [1,2,3,4]}, &amp;length/1)
+{:ok, %{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}}
+
+iex&gt; Morphix.morphify([1,2], &amp;String.length/1)
+{:error, &quot;Unable to apply &amp;String.length/1 to each of [1, 2]&quot;}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="morphify!/2">
+  
+  <div class="detail-header">
+    <a href="#morphify!/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">morphify!(enum, funct)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>morphify!(<a href="http://elixir-lang.org/docs/stable/elixir/List.html#t:t/0">List.t</a>, Function) :: <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a></pre>
+        
+          <pre>morphify!(<a href="http://elixir-lang.org/docs/stable/elixir/Tuple.html#t:t/0">Tuple.t</a>, Function) :: <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a list and a function as arguments and returns a Map, with the keys of the map the result of applying the function to each item in the list.</p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.morphify!([[1,2,3], [12], [1,2,3,4]], &amp;Enum.count/1)
+%{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}
+</code></pre>
 
   </section>
 </div>
