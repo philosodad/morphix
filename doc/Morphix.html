@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.3">
-    <title>Morphix – morphix v0.0.3</title>
+    <title>Morphix – morphix v0.0.4</title>
     <link rel="stylesheet" href="dist/app-091c05798a.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -26,7 +26,7 @@
         morphix
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.3
+        v0.0.4
       </h2>
     </div>
     
@@ -58,7 +58,7 @@
 
 
       <h1>
-        <small class="visible-xs">morphix v0.0.3</small>
+        <small class="visible-xs">morphix v0.0.4</small>
         Morphix
         
         
@@ -66,7 +66,7 @@
 
       
         <section id="moduledoc">
-          <p>Morphix provides convenience methods for dealing with Maps, Lists, and Tuples. </p>
+          <p>Morphix provides convenience methods for dealing with Maps, Lists, and Tuples.</p>
 <p><code class="inline">morphiflat</code> and <code class="inline">morphiflat!</code> flatten maps, discarding top level keys.</p>
 <h3>Examples:</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.morphiflat %{flatten: %{this: &quot;map&quot;}, if: &quot;you please&quot;}
@@ -76,7 +76,7 @@
 iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot;}
 %{this: &quot;map&quot;, o: &quot;k&quot;}
 </code></pre>
-<p><code class="inline">morphify!</code> and <code class="inline">morphify</code> will take either a List or a Tuple as the first argument, and a function as the second. Returns a map, with the keys of the map being the function applied to each member of the input. </p>
+<p><code class="inline">morphify!</code> and <code class="inline">morphify</code> will take either a List or a Tuple as the first argument, and a function as the second. Returns a map, with the keys of the map being the function applied to each member of the input.</p>
 <h3>Examples:</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.morphify!({[1,2,3], [12], [1,2,3,4]}, &amp;length/1)
 %{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}
@@ -116,10 +116,28 @@ iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot
 </div>
 <div class="summary-row">
   <div class="summary-signature">
+    <a href="#atomorphiform/2">atomorphiform(map, atom)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a map and the <code class="inline">:safe</code> flag as arguments and returns <code class="inline">{:ok, map}</code>, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
     <a href="#atomorphify/1">atomorphify(map)</a>
   </div>
   
     <div class="summary-synopsis"><p>Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#atomorphify/2">atomorphify(map, atom)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a map and the <code class="inline">:safe</code> flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps</p>
 </div>
   
 </div>
@@ -209,6 +227,35 @@ iex&gt; Morphix.atomorphiform(%{&quot;this&quot; =&gt; [&quot;map&quot;, %{&quot
 
   </section>
 </div>
+<div class="detail" id="atomorphiform/2">
+  
+  <div class="detail-header">
+    <a href="#atomorphiform/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">atomorphiform(map, atom)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>atomorphiform(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>, :safe) :: {:ok, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map and the <code class="inline">:safe</code> flag as arguments and returns <code class="inline">{:ok, map}</code>, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.</p>
+<p>Works recursively on embedded maps.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; [:allowed, :values]
+iex&gt; map = %{&quot;allowed&quot; =&gt; &quot;atoms&quot;, &quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, &quot;values&quot; =&gt; &quot;to atoms&quot;}}
+iex&gt; Morphix.atomorphiform(map, :safe)
+{:ok, %{&quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, values: &quot;to atoms&quot;}, allowed: &quot;atoms&quot;}}
+</code></pre>
+
+  </section>
+</div>
 <div class="detail" id="atomorphify/1">
   
   <div class="detail-header">
@@ -234,6 +281,33 @@ iex&gt; Morphix.atomorphiform(%{&quot;this&quot; =&gt; [&quot;map&quot;, %{&quot
 
 iex&gt; Morphix.atomorphify(%{1 =&gt; &quot;2&quot;, &quot;1&quot; =&gt; 2, &quot;one&quot; =&gt; :two})
 {:ok, %{1 =&gt; &quot;2&quot;, &quot;1&quot;: 2, one: :two}}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="atomorphify/2">
+  
+  <div class="detail-header">
+    <a href="#atomorphify/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">atomorphify(map, atom)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>atomorphify(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>, :safe) :: {:ok, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map and the <code class="inline">:safe</code> flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; :existing_atom
+iex&gt; Morphix.atomorphify(%{&quot;existing_atom&quot; =&gt; &quot;exists&quot;, &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;}, :safe)
+{:ok, %{ &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;, existing_atom: &quot;exists&quot;}}
 </code></pre>
 
   </section>

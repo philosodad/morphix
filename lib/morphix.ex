@@ -42,7 +42,9 @@ defmodule Morphix do
   @spec morphify(Tuple.t, Function) :: {:ok|:error, Map.t | String}
   @spec morphify!(List.t, Function) :: Map.t
   @spec morphify!(Tuple.t, Function) :: Map.t
+  @spec atomorphify(Map.t, :safe) :: {:ok, Map.t}
   @spec atomorphify(Map.t) :: {:ok, Map.t}
+  @spec atomorphiform(Map.t, :safe) :: {:ok, Map.t}
   @spec atomorphiform(Map.t) :: {:ok, Map.t}
 
   @doc """
@@ -117,7 +119,23 @@ defmodule Morphix do
   ```
   """
   def atomorphify(map) when is_map map do
-    {:ok, atomog map}
+    {:ok, atomog(map, &atomize_binary/1)}
+  end
+
+  @doc """
+  Takes a map and the `:safe` flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+
+  ### Examples:
+
+  ```
+  iex> :existing_atom
+  iex> Morphix.atomorphify(%{"existing_atom" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, :safe)
+  {:ok, %{ "non_existent_atom" => "does_not", 1 => "is_ignored", existing_atom: "exists"}}
+
+  ```
+  """
+  def atomorphify(map, :safe) when is_map map do
+    {:ok, (atomog map, &safe_atomize_binary/1)}
   end
 
   @doc """
@@ -135,44 +153,71 @@ defmodule Morphix do
   ```
   """
   def atomorphiform(map) when is_map map do
-    {:ok, depth_atomog(map)}
+    {:ok, depth_atomog(map, &atomize_binary/1)}
   end
 
-  defp process_list_item(item) do
+  @doc """
+  Takes a map and the `:safe` flag as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+
+  Works recursively on embedded maps.
+
+  ### Examples:
+
+  ```
+  iex> [:allowed, :values]
+  iex> map = %{"allowed" => "atoms", "embed" => %{"will" => "convert", "values" => "to atoms"}}
+  iex> Morphix.atomorphiform(map, :safe)
+  {:ok, %{"embed" => %{"will" => "convert", values: "to atoms"}, allowed: "atoms"}}
+
+  ```
+  """
+  def atomorphiform(map, :safe) when is_map map do
+    {:ok, depth_atomog(map, &safe_atomize_binary/1)}
+  end
+
+  defp process_list_item(item, safe_or_atomize) do
     cond do
-      is_map item -> depth_atomog(item)
-      is_list item -> Enum.map(item, fn(x) -> process_list_item(x) end)
+      is_map item -> depth_atomog(item, safe_or_atomize)
+      is_list item -> Enum.map(item, fn(x) -> process_list_item(x, safe_or_atomize) end)
       true -> item
     end
   end
 
-  defp depth_atomog (map) do
+  defp depth_atomog(map, safe_or_atomize) do
     atomkeys = fn({k, v}, acc) ->
       cond do
         is_map v ->
-          Map.put_new(acc, atomize_binary(k), depth_atomog(v))
+          Map.put_new(acc, safe_or_atomize.(k), depth_atomog(v, safe_or_atomize))
         is_list v ->
-          Map.put_new(acc, atomize_binary(k), process_list_item(v))
+          Map.put_new(acc, safe_or_atomize.(k), process_list_item(v, safe_or_atomize))
         true ->
-          Map.put_new(acc, atomize_binary(k), v)
+          Map.put_new(acc, safe_or_atomize.(k), v)
       end
     end
     Enum.reduce(map, %{}, atomkeys)
   end
 
-  defp atomog (map) do
+  defp atomog(map, safe_or_atomize) do
     atomkeys = fn({k, v}, acc) ->
-      Map.put_new(acc, atomize_binary(k), v)
+      Map.put_new(acc, safe_or_atomize.(k), v)
     end
     Enum.reduce(map, %{}, atomkeys)
   end
 
   defp atomize_binary(value) do
     if is_binary(value) do
+      String.to_atom(value)
+    else
+      value
+    end
+  end
+
+  defp safe_atomize_binary(value) do
+    if is_binary(value) do
       try do
         String.to_existing_atom(value)
       rescue
-        ArgumentError -> String.to_atom(value)
+        _ -> value
       end
     else
       value
