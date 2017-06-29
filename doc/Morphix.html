@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.3">
-    <title>Morphix – morphix v0.0.5</title>
+    <title>Morphix – morphix v0.0.6</title>
     <link rel="stylesheet" href="dist/app-091c05798a.css" />
     
       <link rel="canonical" href="https://hexdocs.pm/morphix/Morphix.html" />
@@ -28,7 +28,7 @@
         morphix
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.5
+        v0.0.6
       </h2>
     </div>
     
@@ -60,7 +60,7 @@
 
 
       <h1>
-        <small class="visible-xs">morphix v0.0.5</small>
+        <small class="visible-xs">morphix v0.0.6</small>
         Morphix
         
         
@@ -175,7 +175,7 @@ iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot
     <a href="#compactify!/1">compactify!(map)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Takes a map and removes keys that have nil values</p>
+    <div class="summary-synopsis"><p>Takes a map and removes keys that have nil values, or are empty maps</p>
 </div>
   
 </div>
@@ -452,10 +452,12 @@ iex&gt; Morphix.compactify(&quot;won&#39;t work&quot;)
     
   </div>
   <section class="docstring">
-    <p>Takes a map and removes keys that have nil values.</p>
+    <p>Takes a map and removes keys that have nil values, or are empty maps.</p>
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.compactify!(%{nil_key: nil, not_nil: &quot;nil&quot;})
 %{not_nil: &quot;nil&quot;}
+iex&gt; Morphix.compactify!(%{empty: %{}, not: &quot;not&quot;})
+%{not: &quot;not&quot;}
 </code></pre>
 
   </section>

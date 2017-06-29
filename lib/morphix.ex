@@ -275,19 +275,21 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and removes keys that have nil values.
+  Takes a map and removes keys that have nil values, or are empty maps.
 
   ### Examples
   ```
   iex> Morphix.compactify!(%{nil_key: nil, not_nil: "nil"})
   %{not_nil: "nil"}
+  iex> Morphix.compactify!(%{empty: %{}, not: "not"})
+  %{not: "not"}
 
   ```
   """
 
   def compactify!(map) when is_map(map) do
     map
-    |> Enum.reject(fn({_k,v}) -> is_nil(v) end)
+    |> Enum.reject(fn({_k,v}) -> is_nil(v) || empty_map(v) end)
     |> Enum.into(%{})
   end
 
@@ -334,6 +336,7 @@ defmodule Morphix do
       end
     end
     Enum.reduce(map, %{}, compactor)
+    |> compactify!
   end
 
   @doc """
@@ -352,5 +355,9 @@ defmodule Morphix do
     {:ok, compactiform!(map)}
   rescue
     e -> {:error, e}
+  end
+
+  defp empty_map(map) do
+    is_map(map) && (not Map.has_key?(map, :__struct__)) && Enum.empty?(map)
   end
 end
