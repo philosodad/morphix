@@ -5,8 +5,10 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.3">
-    <title>Morphix – morphix v0.0.4</title>
+    <title>Morphix – morphix v0.0.5</title>
     <link rel="stylesheet" href="dist/app-091c05798a.css" />
+    
+      <link rel="canonical" href="https://hexdocs.pm/morphix/Morphix.html" />
     
     <script src="dist/sidebar_items.js"></script>
   </head>
@@ -26,7 +28,7 @@
         morphix
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.4
+        v0.0.5
       </h2>
     </div>
     
@@ -58,7 +60,7 @@
 
 
       <h1>
-        <small class="visible-xs">morphix v0.0.4</small>
+        <small class="visible-xs">morphix v0.0.5</small>
         Morphix
         
         
@@ -138,6 +140,42 @@ iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot
   </div>
   
     <div class="summary-synopsis"><p>Takes a map and the <code class="inline">:safe</code> flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#compactiform/1">compactiform(map)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Removes keys with nil values from maps, handles nested maps and treats empty maps as nil values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#compactiform!/1">compactiform!(map)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Removes keys with nil values from nested maps, also eliminates empty maps</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#compactify/1">compactify(map)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a map and removes any keys that have nil values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#compactify!/1">compactify!(map)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a map and removes keys that have nil values</p>
 </div>
   
 </div>
@@ -308,6 +346,116 @@ iex&gt; Morphix.atomorphify(%{1 =&gt; &quot;2&quot;, &quot;1&quot; =&gt; 2, &quo
 <pre><code class="iex elixir">iex&gt; :existing_atom
 iex&gt; Morphix.atomorphify(%{&quot;existing_atom&quot; =&gt; &quot;exists&quot;, &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;}, :safe)
 {:ok, %{ &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;, existing_atom: &quot;exists&quot;}}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="compactiform/1">
+  
+  <div class="detail-header">
+    <a href="#compactiform/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">compactiform(map)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>compactiform(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: {:ok, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Removes keys with nil values from maps, handles nested maps and treats empty maps as nil values.</p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.compactiform(%{a: nil, b: &quot;not&quot;, c: %{d: nil, e: %{}, f: %{g: &quot;value&quot;}}})
+{:ok, %{b: &quot;not&quot;, c: %{f: %{g: &quot;value&quot;}}}}
+iex&gt; Morphix.compactiform(5)
+{:error, %FunctionClauseError{arity: 1, function: :compactiform!, module: Morphix}}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="compactiform!/1">
+  
+  <div class="detail-header">
+    <a href="#compactiform!/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">compactiform!(map)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>compactiform!(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Removes keys with nil values from nested maps, also eliminates empty maps.</p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.compactiform!(%{nil_nil: nil, not_nil: &quot;a value&quot;, nested: %{nil_val: nil, other: &quot;other&quot;}})
+%{not_nil: &quot;a value&quot;, nested: %{other: &quot;other&quot;}}
+iex&gt; Morphix.compactiform!(%{nil_nil: nil, not_nil: &quot;a value&quot;, nested: %{nil_val: nil, other: &quot;other&quot;, nested_empty: %{}}})
+%{not_nil: &quot;a value&quot;, nested: %{other: &quot;other&quot;}}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="compactify/1">
+  
+  <div class="detail-header">
+    <a href="#compactify/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">compactify(map)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>compactify(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: {:ok, <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map and removes any keys that have nil values.</p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.compactify(%{nil_key: nil, not_nil: &quot;real value&quot;})
+{:ok, %{not_nil: &quot;real value&quot;}}
+iex&gt; Morphix.compactify(&quot;won&#39;t work&quot;)
+{:error, %FunctionClauseError{arity: 1, function: :compactify!, module: Morphix}}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="compactify!/1">
+  
+  <div class="detail-header">
+    <a href="#compactify!/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">compactify!(map)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>compactify!(<a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a>) :: <a href="http://elixir-lang.org/docs/stable/elixir/Map.html#t:t/0">Map.t</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map and removes keys that have nil values.</p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.compactify!(%{nil_key: nil, not_nil: &quot;nil&quot;})
+%{not_nil: &quot;nil&quot;}
 </code></pre>
 
   </section>

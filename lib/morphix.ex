@@ -46,6 +46,10 @@ defmodule Morphix do
   @spec atomorphify(Map.t) :: {:ok, Map.t}
   @spec atomorphiform(Map.t, :safe) :: {:ok, Map.t}
   @spec atomorphiform(Map.t) :: {:ok, Map.t}
+  @spec compactify(Map.t) :: {:ok, Map.t}
+  @spec compactify!(Map.t) :: Map.t
+  @spec compactiform!(Map.t) :: Map.t
+  @spec compactiform(Map.t) :: {:ok, Map.t}
 
   @doc """
   Takes a map and returns a flattend version of that map, discarding any nested keys.
@@ -270,4 +274,82 @@ defmodule Morphix do
     fn(x, acc) -> Map.put(acc, funct.(x), x) end)
   end
 
+  @doc """
+  Takes a map and removes keys that have nil values.
+
+  ### Examples
+  ```
+  iex> Morphix.compactify!(%{nil_key: nil, not_nil: "nil"})
+  %{not_nil: "nil"}
+
+  ```
+  """
+
+  def compactify!(map) when is_map(map) do
+    map
+    |> Enum.reject(fn({_k,v}) -> is_nil(v) end)
+    |> Enum.into(%{})
+  end
+
+  @doc """
+  Takes a map and removes any keys that have nil values.
+
+  ### Examples
+  ```
+  iex> Morphix.compactify(%{nil_key: nil, not_nil: "real value"})
+  {:ok, %{not_nil: "real value"}}
+  iex> Morphix.compactify("won't work")
+  {:error, %FunctionClauseError{arity: 1, function: :compactify!, module: Morphix}}
+
+  ```
+  """
+
+  def compactify(map) do
+    {:ok, compactify!(map)}
+  rescue
+    e -> {:error, e}
+  end
+
+  @doc """
+  Removes keys with nil values from nested maps, also eliminates empty maps.
+
+  ### Examples
+  ```
+  iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other"}})
+  %{not_nil: "a value", nested: %{other: "other"}}
+  iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}})
+  %{not_nil: "a value", nested: %{other: "other"}}
+
+  ```
+  """
+
+  def compactiform!(map) when is_map(map) do
+    compactor = fn({k, v}, acc) ->
+      cond do
+        is_map(v) and Enum.empty?(v) -> acc
+        is_map(v) -> Map.put_new(acc, k, compactiform!(v))
+        is_nil(v) -> acc
+        true -> Map.put_new(acc, k, v)
+      end
+    end
+    Enum.reduce(map, %{}, compactor)
+  end
+
+  @doc """
+  Removes keys with nil values from maps, handles nested maps and treats empty maps as nil values.
+
+  ### Examples
+  ```
+  iex> Morphix.compactiform(%{a: nil, b: "not", c: %{d: nil, e: %{}, f: %{g: "value"}}})
+  {:ok, %{b: "not", c: %{f: %{g: "value"}}}}
+  iex> Morphix.compactiform(5)
+  {:error, %FunctionClauseError{arity: 1, function: :compactiform!, module: Morphix}}
+
+  ```
+  """
+  def compactiform(map) do
+    {:ok, compactiform!(map)}
+  rescue
+    e -> {:error, e}
+  end
 end
