@@ -32,4 +32,15 @@ defmodule MorphixTest do
                     }
     assert Morphix.atomorphiform(test_map) == {:ok, expected_map}
   end
+
+  test "compactiform will ignore structs" do
+    time = DateTime.utc_now()
+    test_map = %{
+                  "this" => time,
+                  "that" => nil,
+                  "the" => "other"
+                }
+    expected_map = %{"the" => "other", "this" => time}
+    assert Morphix.compactiform(test_map) == {:ok, expected_map}
+  end
 end
