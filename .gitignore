@@ -3,5 +3,6 @@
 erl_crash.dump
 *.ez
 *.swp
+*.swo
 .tool-versions*
 /cover

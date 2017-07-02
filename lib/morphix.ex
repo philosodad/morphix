@@ -10,7 +10,6 @@ defmodule Morphix do
   iex> Morphix.morphiflat %{flatten: %{this: "map"}, if: "you please"}
   {:ok, %{this: "map", if: "you please"}}
 
-
   iex> Morphix.morphiflat! %{flatten: %{this: "map"}, o: "k"}
   %{this: "map", o: "k"}
 
@@ -34,6 +33,8 @@ defmodule Morphix do
   {:ok, %{:a => 2, 'a' => :two }}
 
   ```
+
+  `compactify` and `compactiform` take a map as an input and return a filtered map, removing any keys with nil values or with an empty map as a value.
   """
 
   @spec morphiflat(Map.t) :: {:ok | :error, Map.t | String}
@@ -89,11 +90,9 @@ defmodule Morphix do
   ```
   """
   def morphiflat(map) when is_map map do
-    try do
-      {:ok, flattn map}
-    rescue
-      exception -> {:error, Exception.message(exception)}
-    end
+    {:ok, flattn map}
+  rescue
+    exception -> {:error, Exception.message(exception)}
   end
   def morphiflat(not_map), do: {:error, "#{inspect(not_map)} is not a Map"}
 
@@ -238,7 +237,6 @@ defmodule Morphix do
   iex> Morphix.morphify([[1,2,3], [12], [1,2,3,4]], &Enum.count/1)
   {:ok, %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}}
 
-
   iex> Morphix.morphify({[1,2,3], [12], [1,2,3,4]}, &length/1)
   {:ok, %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}}
 
@@ -250,11 +248,9 @@ defmodule Morphix do
   def morphify(enum, funct) when is_tuple(enum), do: morphify(Tuple.to_list(enum), funct)
 
   def morphify(enum, funct) do
-    try do
-      {:ok, morphify!(enum, funct)}
-    rescue
-      _ -> {:error, "Unable to apply #{inspect(funct)} to each of #{inspect(enum)}"}
-    end
+    {:ok, morphify!(enum, funct)}
+  rescue
+    _ -> {:error, "Unable to apply #{inspect(funct)} to each of #{inspect(enum)}"}
   end
 
   @doc """
@@ -281,6 +277,7 @@ defmodule Morphix do
   ```
   iex> Morphix.compactify!(%{nil_key: nil, not_nil: "nil"})
   %{not_nil: "nil"}
+
   iex> Morphix.compactify!(%{empty: %{}, not: "not"})
   %{not: "not"}
 
@@ -289,7 +286,7 @@ defmodule Morphix do
 
   def compactify!(map) when is_map(map) do
     map
-    |> Enum.reject(fn({_k,v}) -> is_nil(v) || empty_map(v) end)
+    |> Enum.reject(fn({_k, v}) -> is_nil(v) || empty_map(v) end)
     |> Enum.into(%{})
   end
 
@@ -300,6 +297,7 @@ defmodule Morphix do
   ```
   iex> Morphix.compactify(%{nil_key: nil, not_nil: "real value"})
   {:ok, %{not_nil: "real value"}}
+
   iex> Morphix.compactify("won't work")
   {:error, %FunctionClauseError{arity: 1, function: :compactify!, module: Morphix}}
 
@@ -319,6 +317,7 @@ defmodule Morphix do
   ```
   iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other"}})
   %{not_nil: "a value", nested: %{other: "other"}}
+
   iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}})
   %{not_nil: "a value", nested: %{other: "other"}}
 
@@ -328,14 +327,15 @@ defmodule Morphix do
   def compactiform!(map) when is_map(map) do
     compactor = fn({k, v}, acc) ->
       cond do
-        is_map(v) and Map.has_key?(v, :__struct__) -> Map.put_new(acc, k, v)
+        is_struct(v) -> Map.put_new(acc, k, v)
         is_map(v) and Enum.empty?(v) -> acc
         is_map(v) -> Map.put_new(acc, k, compactiform!(v))
         is_nil(v) -> acc
         true -> Map.put_new(acc, k, v)
       end
     end
-    Enum.reduce(map, %{}, compactor)
+    map
+    |> Enum.reduce(%{}, compactor)
     |> compactify!
   end
 
@@ -346,6 +346,7 @@ defmodule Morphix do
   ```
   iex> Morphix.compactiform(%{a: nil, b: "not", c: %{d: nil, e: %{}, f: %{g: "value"}}})
   {:ok, %{b: "not", c: %{f: %{g: "value"}}}}
+
   iex> Morphix.compactiform(5)
   {:error, %FunctionClauseError{arity: 1, function: :compactiform!, module: Morphix}}
 
@@ -360,4 +361,6 @@ defmodule Morphix do
   defp empty_map(map) do
     is_map(map) && (not Map.has_key?(map, :__struct__)) && Enum.empty?(map)
   end
+
+  defp is_struct(s), do: is_map(s) and Map.has_key?(s, :__struct__)
 end

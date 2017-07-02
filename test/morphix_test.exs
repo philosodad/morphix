@@ -39,13 +39,30 @@ defmodule MorphixTest do
                   "this" => time,
                   "that" => nil,
                   "the" => "other",
-                  "how" => %{the: nil, heck: nil},
-                  "but" => %{what: %{}, about: "this"}
+                  "how" => %{the: nil, 
+                             heck: nil,
+                             empty: %{empty: %{empty: %{}},
+                                      blank: nil,
+                                      empte: %{sort: %{}, of: nil}}},
+                  "but" => %{what: %{},
+                             about: "this",
+                             deeper: %{nested: "map",
+                                       that: %{},
+                                       maps: %{ very: "deep", indeed: nil},
+                                       time: time
+                                     }
+                             }
                 }
     expected_map = %{
                       "the" => "other",
                       "this" => time,
-                      "but" => %{about: "this"}
+                      "but" => %{about: "this",
+                                 deeper: %{nested: "map",
+                                           maps: %{very: "deep"},
+                                           time: time
+                                         }
+                                }
+
                    }
     assert Morphix.compactiform(test_map) == {:ok, expected_map}
   end
