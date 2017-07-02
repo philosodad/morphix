@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.0.7]
+### Added
+- added compactify and compactiform functions for eliminating nil values from maps.
+
 ## [v0.0.4]
 ### Added
 - added `:safe` option for `atomorphif*` functions, if used, only existing atoms will be used in string conversion.
