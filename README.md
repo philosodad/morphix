@@ -10,13 +10,13 @@ Tiny library of functions to perform transforms on maps and arrays.
 ## Installation
 
 The package can be installed from hex.pm
-  
-  1. Add morphix to your list of dependencies in `mix.exs`:
-      
-        def deps do
-          [{:morphix, "~> 0.0.1"}]
-        end
+
+1. Add morphix to your list of dependencies in `mix.exs`:
+
+    def deps do
+      [{:morphix, "~> 0.0.7"}]
+    end
 
 ## Usage
 
-  Documenation is [available online](https://hexdocs.pm/morphix/Morphix.html)
+Documenation is [available online](https://hexdocs.pm/morphix/Morphix.html)
