@@ -19,4 +19,4 @@ The package can be installed from hex.pm
 
 ## Usage
 
-Documenation is [available online](https://hexdocs.pm/morphix/Morphix.html)
+Documentation is [available online](https://hexdocs.pm/morphix/Morphix.html)
