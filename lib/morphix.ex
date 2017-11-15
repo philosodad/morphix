@@ -51,7 +51,7 @@ defmodule Morphix do
   @spec compactify!(Map.t) :: Map.t
   @spec compactiform!(Map.t) :: Map.t
   @spec compactiform(Map.t) :: {:ok, Map.t}
-   @spec partiphify!(List.t, Integer) :: List.t
+  @spec partiphify!(List.t, Integer) :: List.t
 
   @doc """
   Takes a map and returns a flattend version of that map, discarding any nested keys.
