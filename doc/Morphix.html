@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.3">
-    <title>Morphix – morphix v0.0.6</title>
+    <title>Morphix – morphix v0.0.8</title>
     <link rel="stylesheet" href="dist/app-091c05798a.css" />
     
       <link rel="canonical" href="https://hexdocs.pm/morphix/Morphix.html" />
@@ -28,7 +28,7 @@
         morphix
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.0.6
+        v0.0.8
       </h2>
     </div>
     
@@ -60,7 +60,7 @@
 
 
       <h1>
-        <small class="visible-xs">morphix v0.0.6</small>
+        <small class="visible-xs">morphix v0.0.8</small>
         Morphix
         
         
@@ -73,7 +73,6 @@
 <h3>Examples:</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.morphiflat %{flatten: %{this: &quot;map&quot;}, if: &quot;you please&quot;}
 {:ok, %{this: &quot;map&quot;, if: &quot;you please&quot;}}
-
 
 iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot;}
 %{this: &quot;map&quot;, o: &quot;k&quot;}
@@ -88,6 +87,7 @@ iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot
 <pre><code class="iex elixir">iex&gt; Morphix.atomorphify(%{&quot;a&quot; =&gt; &quot;2&quot;, :a =&gt; 2, &#39;a&#39;  =&gt; :two})
 {:ok, %{:a =&gt; 2, &#39;a&#39; =&gt; :two }}
 </code></pre>
+<p><code class="inline">compactify</code> and <code class="inline">compactiform</code> take a map as an input and return a filtered map, removing any keys with nil values or with an empty map as a value.</p>
 
         </section>
       
@@ -212,6 +212,15 @@ iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot
   </div>
   
     <div class="summary-synopsis"><p>Takes a list and a function as arguments and returns a Map, with the keys of the map the result of applying the function to each item in the list</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#partiphify!/2">partiphify!(list, k)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible</p>
 </div>
   
 </div>
@@ -372,6 +381,7 @@ iex&gt; Morphix.atomorphify(%{&quot;existing_atom&quot; =&gt; &quot;exists&quot;
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.compactiform(%{a: nil, b: &quot;not&quot;, c: %{d: nil, e: %{}, f: %{g: &quot;value&quot;}}})
 {:ok, %{b: &quot;not&quot;, c: %{f: %{g: &quot;value&quot;}}}}
+
 iex&gt; Morphix.compactiform(5)
 {:error, %FunctionClauseError{arity: 1, function: :compactiform!, module: Morphix}}
 </code></pre>
@@ -400,6 +410,7 @@ iex&gt; Morphix.compactiform(5)
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.compactiform!(%{nil_nil: nil, not_nil: &quot;a value&quot;, nested: %{nil_val: nil, other: &quot;other&quot;}})
 %{not_nil: &quot;a value&quot;, nested: %{other: &quot;other&quot;}}
+
 iex&gt; Morphix.compactiform!(%{nil_nil: nil, not_nil: &quot;a value&quot;, nested: %{nil_val: nil, other: &quot;other&quot;, nested_empty: %{}}})
 %{not_nil: &quot;a value&quot;, nested: %{other: &quot;other&quot;}}
 </code></pre>
@@ -428,6 +439,7 @@ iex&gt; Morphix.compactiform!(%{nil_nil: nil, not_nil: &quot;a value&quot;, nest
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.compactify(%{nil_key: nil, not_nil: &quot;real value&quot;})
 {:ok, %{not_nil: &quot;real value&quot;}}
+
 iex&gt; Morphix.compactify(&quot;won&#39;t work&quot;)
 {:error, %FunctionClauseError{arity: 1, function: :compactify!, module: Morphix}}
 </code></pre>
@@ -456,6 +468,7 @@ iex&gt; Morphix.compactify(&quot;won&#39;t work&quot;)
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.compactify!(%{nil_key: nil, not_nil: &quot;nil&quot;})
 %{not_nil: &quot;nil&quot;}
+
 iex&gt; Morphix.compactify!(%{empty: %{}, not: &quot;not&quot;})
 %{not: &quot;not&quot;}
 </code></pre>
@@ -546,7 +559,6 @@ iex&gt; Morphix.compactify!(%{empty: %{}, not: &quot;not&quot;})
 <pre><code class="iex elixir">iex&gt; Morphix.morphify([[1,2,3], [12], [1,2,3,4]], &amp;Enum.count/1)
 {:ok, %{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}}
 
-
 iex&gt; Morphix.morphify({[1,2,3], [12], [1,2,3,4]}, &amp;length/1)
 {:ok, %{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}}
 
@@ -581,6 +593,34 @@ iex&gt; Morphix.morphify([1,2], &amp;String.length/1)
 <pre><code class="iex elixir">iex&gt; Morphix.morphify!([[1,2,3], [12], [1,2,3,4]], &amp;Enum.count/1)
 %{1 =&gt; [12], 3 =&gt; [1,2,3], 4 =&gt; [1,2,3,4]}
 </code></pre>
+
+  </section>
+</div>
+<div class="detail" id="partiphify!/2">
+  
+  <div class="detail-header">
+    <a href="#partiphify!/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">partiphify!(list, k)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>partiphify!(<a href="http://elixir-lang.org/docs/stable/elixir/List.html#t:t/0">List.t</a>, Integer) :: <a href="http://elixir-lang.org/docs/stable/elixir/List.html#t:t/0">List.t</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible</p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.partiphify!([1,2,3,4,5,6], 4)
+[[5,1], [6,2], [3], [4]]
+
+iex&gt; Morphix.partiphify!((&quot;abcdefghijklmnop&quot; |&gt; String.split(&quot;&quot;)), 4)
+[[&quot;&quot;, &quot;m&quot;, &quot;i&quot;, &quot;e&quot;, &quot;a&quot;], [&quot;n&quot;, &quot;j&quot;, &quot;f&quot;, &quot;b&quot;], [&quot;o&quot;, &quot;k&quot;, &quot;g&quot;, &quot;c&quot;], [&quot;p&quot;, &quot;l&quot;, &quot;h&quot;, &quot;d&quot;]]</code></pre>
 
   </section>
 </div>

@@ -373,7 +373,7 @@ defmodule Morphix do
   """
   def partiphify!(list, k) do
     buckets = (1..k)
-              |> Enum.map(fn(k) -> [] end)
+              |> Enum.map(fn(_) -> [] end)
     list
     |> Enum.reduce({0, buckets}, fn(i, {index, buckets}) ->
       {current_bucket, rest} = List.pop_at(buckets, index)

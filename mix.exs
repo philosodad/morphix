@@ -5,7 +5,7 @@ defmodule Morphix.Mixfile do
     [
       app: :morphix,
       version: "0.0.8",
-      elixir: "~> 1.3",
+      elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       package: package(),
