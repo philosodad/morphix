@@ -51,6 +51,7 @@ defmodule Morphix do
   @spec compactify!(Map.t) :: Map.t
   @spec compactiform!(Map.t) :: Map.t
   @spec compactiform(Map.t) :: {:ok, Map.t}
+   @spec partiphify!(List.t, Integer) :: List.t
 
   @doc """
   Takes a map and returns a flattend version of that map, discarding any nested keys.
@@ -358,6 +359,30 @@ defmodule Morphix do
     e -> {:error, e}
   end
 
+  @doc """
+  Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible
+
+  ### Examples
+  ```
+  iex> Morphix.partiphify!([1,2,3,4,5,6], 4)
+  [[5,1], [6,2], [3], [4]]
+
+  iex> Morphix.partiphify!(("abcdefghijklmnop" |> String.split("")), 4)
+  [["", "m", "i", "e", "a"], ["n", "j", "f", "b"], ["o", "k", "g", "c"], ["p", "l", "h", "d"]]
+  ```
+  """
+  def partiphify!(list, k) do
+    buckets = (1..k)
+              |> Enum.map(fn(k) -> [] end)
+    list
+    |> Enum.reduce({0, buckets}, fn(i, {index, buckets}) ->
+      {current_bucket, rest} = List.pop_at(buckets, index)
+      new_bucket = [i | current_bucket]
+      {Integer.mod(index + 1, k), List.insert_at(rest, index, new_bucket)}
+    end)
+    |> elem(1)
+  end
+  
   defp empty_map(map) do
     is_map(map) && (not Map.has_key?(map, :__struct__)) && Enum.empty?(map)
   end
