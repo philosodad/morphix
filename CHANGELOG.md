@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.1.0]
+### Added
+- added `partiphify/2` function for partitioning lists
+
+### Changed
+- several functions now return `%BadMapError{}` instead of function undefined errors.
+
+## [v0.0.8]
+### Added
+- added partiphify! function for partitioning lists
+
 ## [v0.0.7]
 ### Added
 - added compactify and compactiform functions for eliminating nil values from maps.

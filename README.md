@@ -13,9 +13,11 @@ The package can be installed from hex.pm
 
 1. Add morphix to your list of dependencies in `mix.exs`:
 
+    ```
     def deps do
-      [{:morphix, "~> 0.0.7"}]
+      [{:morphix, "~> 0.1.0"}]
     end
+    ```
 
 ## Usage
 

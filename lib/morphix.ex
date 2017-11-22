@@ -2,7 +2,7 @@ defmodule Morphix do
   @moduledoc """
   Morphix provides convenience methods for dealing with Maps, Lists, and Tuples.
 
-  `morphiflat` and `morphiflat!` flatten maps, discarding top level keys.
+  `morphiflat/1` and `morphiflat!/1` flatten maps, discarding top level keys.
 
   ### Examples:
 
@@ -15,7 +15,7 @@ defmodule Morphix do
 
   ```
 
-  `morphify!` and `morphify` will take either a List or a Tuple as the first argument, and a function as the second. Returns a map, with the keys of the map being the function applied to each member of the input.
+  `morphify!/2` and `morphify/2` will take either a List or a Tuple as the first argument, and a function as the second. Returns a map, with the keys of the map being the function applied to each member of the input.
 
   ### Examples:
 
@@ -25,7 +25,8 @@ defmodule Morphix do
 
   ```
 
-  `atomorphify` and `atomorphiform` take a map as an input and return the map with all string keys converted to atoms. `atomorphiform` is recursive.
+  `atomorphify/1` and `atomorphiform/1` take a map as an input and return the map with all string keys converted to atoms. `atomorphiform/1` is recursive. `atomorphiform/2` and `atomormiphify/2` take `:safe` as a second argument, they will not convert string keys if the resulting atom has not been defined.
+
   ### Examples:
 
   ```
@@ -35,23 +36,44 @@ defmodule Morphix do
   ```
 
   `compactify` and `compactiform` take a map as an input and return a filtered map, removing any keys with nil values or with an empty map as a value.
+
+  `partiphify!/2` and `partiphify/2` take a list `l` and an integer `k` and partition `l` into `k` sublists of balanced size. There will always be `k` lists, even if some must be empty.
+
+  ### Examples:
+  
+  ```
+  iex> Morphix.partiphify!([:a, :b, :c, :d, :e, :f], 4)
+  [[:e, :a], [:f, :b], [:c], [:d]]
+
+  iex> Morphix.partiphify!([:a, :b, :c, :d, :e], 4)
+  [[:e, :a], [:b], [:c], [:d]]
+
+  iex> Morphix.partiphify!([:a, :b, :c, :d], 4)
+  [[:a], [:b], [:c], [:d]]
+
+  iex> Morphix.partiphify!([:a, :b, :c], 4)
+  [[:a], [:b], [:c], []]
+
+  ```
+
   """
 
-  @spec morphiflat(Map.t) :: {:ok | :error, Map.t | String}
-  @spec morphiflat!(Map.t) :: Map.t
-  @spec morphify(List.t, Function) :: {:ok|:error, Map.t | String}
-  @spec morphify(Tuple.t, Function) :: {:ok|:error, Map.t | String}
-  @spec morphify!(List.t, Function) :: Map.t
-  @spec morphify!(Tuple.t, Function) :: Map.t
-  @spec atomorphify(Map.t, :safe) :: {:ok, Map.t}
-  @spec atomorphify(Map.t) :: {:ok, Map.t}
-  @spec atomorphiform(Map.t, :safe) :: {:ok, Map.t}
-  @spec atomorphiform(Map.t) :: {:ok, Map.t}
-  @spec compactify(Map.t) :: {:ok, Map.t}
-  @spec compactify!(Map.t) :: Map.t
-  @spec compactiform!(Map.t) :: Map.t
-  @spec compactiform(Map.t) :: {:ok, Map.t}
-  @spec partiphify!(List.t, Integer) :: List.t
+  @spec morphiflat(map()) :: {:ok | :error, map() | String}
+  @spec morphiflat!(map()) :: map()
+  @spec morphify([any], fun()) :: {:ok|:error, map() | String.t}
+  @spec morphify(tuple(), fun()) :: {:ok|:error, map() | String.t}
+  @spec morphify!([any], fun()) :: map()
+  @spec morphify!(tuple(), fun()) :: map()
+  @spec atomorphify(map(), :safe) :: {:ok, map()}
+  @spec atomorphify(map()) :: {:ok, map}
+  @spec atomorphiform(map(), :safe) :: {:ok, map()}
+  @spec atomorphiform(map()) :: {:ok, map}
+  @spec compactify(map()) :: {:ok, map()} | no_return
+  @spec compactify!(map()) :: map() | no_return
+  @spec compactiform!(map()) :: map() | no_return
+  @spec compactiform(map()) :: {:ok, map()} | {:error, %BadMapError{}}
+  @spec partiphify!(list(), integer) :: [list[any]] | no_return
+  @spec partiphify(list(), integer) :: {:ok, [list[any]]} | {:error, term}
 
   @doc """
   Takes a map and returns a flattend version of that map, discarding any nested keys.
@@ -282,6 +304,9 @@ defmodule Morphix do
   iex> Morphix.compactify!(%{empty: %{}, not: "not"})
   %{not: "not"}
 
+  iex> Morphix.compactify!({"not", "a map"})
+  ** (BadMapError) expected a map, got: {"not", "a map"}
+
   ```
   """
 
@@ -289,6 +314,10 @@ defmodule Morphix do
     map
     |> Enum.reject(fn({_k, v}) -> is_nil(v) || empty_map(v) end)
     |> Enum.into(%{})
+  end
+
+  def compactify!(not_map) do
+    raise(BadMapError, term: not_map)
   end
 
   @doc """
@@ -300,7 +329,7 @@ defmodule Morphix do
   {:ok, %{not_nil: "real value"}}
 
   iex> Morphix.compactify("won't work")
-  {:error, %FunctionClauseError{arity: 1, function: :compactify!, module: Morphix}}
+  {:error, %BadMapError{term: "won't work"}} 
 
   ```
   """
@@ -340,6 +369,10 @@ defmodule Morphix do
     |> compactify!
   end
 
+  def compactiform!(not_map) do
+    raise(BadMapError, term: not_map)
+  end
+
   @doc """
   Removes keys with nil values from maps, handles nested maps and treats empty maps as nil values.
 
@@ -349,7 +382,7 @@ defmodule Morphix do
   {:ok, %{b: "not", c: %{f: %{g: "value"}}}}
 
   iex> Morphix.compactiform(5)
-  {:error, %FunctionClauseError{arity: 1, function: :compactiform!, module: Morphix}}
+  {:error, %BadMapError{term: 5}}
 
   ```
   """
@@ -371,7 +404,7 @@ defmodule Morphix do
   [["", "m", "i", "e", "a"], ["n", "j", "f", "b"], ["o", "k", "g", "c"], ["p", "l", "h", "d"]]
   ```
   """
-  def partiphify!(list, k) do
+  def partiphify!(list, k) when is_list(list) and is_integer(k) do
     buckets = (1..k)
               |> Enum.map(fn(_) -> [] end)
     list
@@ -382,7 +415,25 @@ defmodule Morphix do
     end)
     |> elem(1)
   end
-  
+
+  @doc """
+  Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible
+
+  ### Examples
+  ```
+  iex> Morphix.partiphify([1,2,3,4,5,6], 4)
+  {:ok, [[5,1], [6,2], [3], [4]]}
+
+  iex> Morphix.partiphify(("abcdefghijklmnop" |> String.split("")), 4)
+  {:ok, [["", "m", "i", "e", "a"], ["n", "j", "f", "b"], ["o", "k", "g", "c"], ["p", "l", "h", "d"]]}
+  ```
+  """
+  def partiphify(list, k) do
+    {:ok, partiphify!(list, k)}
+  rescue
+    e -> {:error, e}
+  end
+
   defp empty_map(map) do
     is_map(map) && (not Map.has_key?(map, :__struct__)) && Enum.empty?(map)
   end
