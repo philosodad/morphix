@@ -40,13 +40,13 @@ defmodule Morphix do
   `partiphify!/2` and `partiphify/2` take a list `l` and an integer `k` and partition `l` into `k` sublists of balanced size. There will always be `k` lists, even if some must be empty.
 
   ### Examples:
-  
+
   ```
   iex> Morphix.partiphify!([:a, :b, :c, :d, :e, :f], 4)
-  [[:e, :a], [:f, :b], [:c], [:d]]
+  [[:c], [:d], [:e, :a], [:f, :b]]
 
   iex> Morphix.partiphify!([:a, :b, :c, :d, :e], 4)
-  [[:e, :a], [:b], [:c], [:d]]
+  [[:b], [:c], [:d], [:e, :a]]
 
   iex> Morphix.partiphify!([:a, :b, :c, :d], 4)
   [[:a], [:b], [:c], [:d]]
@@ -398,22 +398,41 @@ defmodule Morphix do
   ### Examples
   ```
   iex> Morphix.partiphify!([1,2,3,4,5,6], 4)
-  [[5,1], [6,2], [3], [4]]
+  [[3], [4], [5, 1], [6, 2]]
 
   iex> Morphix.partiphify!(("abcdefghijklmnop" |> String.split("")), 4)
-  [["", "m", "i", "e", "a"], ["n", "j", "f", "b"], ["o", "k", "g", "c"], ["p", "l", "h", "d"]]
+  [["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"], ["", "a", "b", "c", "d"]]
+
   ```
   """
   def partiphify!(list, k) when is_list(list) and is_integer(k) do
-    buckets = (1..k)
-              |> Enum.map(fn(_) -> [] end)
-    list
-    |> Enum.reduce({0, buckets}, fn(i, {index, buckets}) ->
-      {current_bucket, rest} = List.pop_at(buckets, index)
-      new_bucket = [i | current_bucket]
-      {Integer.mod(index + 1, k), List.insert_at(rest, index, new_bucket)}
-    end)
-    |> elem(1)
+    ceil_div = fn(a, b) -> Float.ceil(a / b)  end
+    with chunk_size when chunk_size > 0 <- list
+                                           |> Enum.count()
+                                           |> Integer.floor_div(k),
+         true <- (list
+                 |> Enum.count()
+                 |> Integer.mod(k)
+                 |> ceil_div.(chunk_size)) > 0 do
+      list
+      |> into_buckets(k, chunk_size)
+      |> distribute_extra()
+    else
+      0 -> list = Enum.chunk(list, 1, 1, [])
+           empty_buckets = k - Enum.count(list)
+           Enum.reduce(1..empty_buckets, list, fn(_, acc) -> acc ++ [[]] end)
+      false -> chunk_size = list
+                            |> Enum.count()
+                            |> Integer.floor_div(k)
+               Enum.chunk(list, chunk_size, chunk_size, [])
+    end
+  end
+
+  defp into_buckets(list, k, chunk_size) do
+    chunks = Enum.chunk(list, chunk_size, chunk_size, [])
+    extra_buckets = Enum.take(chunks, -(Enum.count(chunks) - k))
+    k_buckets = chunks -- extra_buckets
+    {extra_buckets, k_buckets}
   end
 
   @doc """
@@ -422,16 +441,34 @@ defmodule Morphix do
   ### Examples
   ```
   iex> Morphix.partiphify([1,2,3,4,5,6], 4)
-  {:ok, [[5,1], [6,2], [3], [4]]}
+  {:ok, [[3], [4], [5, 1], [6, 2]]}
 
   iex> Morphix.partiphify(("abcdefghijklmnop" |> String.split("")), 4)
-  {:ok, [["", "m", "i", "e", "a"], ["n", "j", "f", "b"], ["o", "k", "g", "c"], ["p", "l", "h", "d"]]}
+  {:ok, [["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"], ["", "a", "b", "c", "d"]]}
   ```
   """
   def partiphify(list, k) do
     {:ok, partiphify!(list, k)}
   rescue
     e -> {:error, e}
+  end
+
+  defp distribute(list, buckets) do
+    Enum.reduce(list, buckets, fn(item, buckets) ->
+      [current_bucket | rest_of_buckets] = buckets
+      new_bucket = [item | current_bucket]
+      rest_of_buckets ++ [new_bucket]
+    end)
+  end
+
+  defp distribute_extra({lists, buckets}) do
+    with false <- Enum.empty?(lists) do
+      [current_list | rest] = lists
+      new_buckets = distribute(current_list, buckets)
+      distribute_extra({rest, new_buckets})
+    else
+      _ -> buckets
+    end
   end
 
   defp empty_map(map) do
