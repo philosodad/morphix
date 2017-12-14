@@ -64,10 +64,18 @@ defmodule Morphix do
   @spec morphify(tuple(), fun()) :: {:ok|:error, map() | String.t}
   @spec morphify!([any], fun()) :: map()
   @spec morphify!(tuple(), fun()) :: map()
+  @spec atomorphify(map()) :: {:ok, map()}
   @spec atomorphify(map(), :safe) :: {:ok, map()}
-  @spec atomorphify(map()) :: {:ok, map}
+  @spec atomorphify(map(), list()) :: {:ok, map()}
+  @spec atomorphify!(map()) :: map()
+  @spec atomorphify!(map(), :safe) :: map()
+  @spec atomorphify!(map(), list()) :: map()
+  @spec atomorphiform(map()) :: {:ok, map()}
   @spec atomorphiform(map(), :safe) :: {:ok, map()}
-  @spec atomorphiform(map()) :: {:ok, map}
+  @spec atomorphiform(map(), list()) :: {:ok, map()}
+  @spec atomorphiform!(map()) :: map()
+  @spec atomorphiform!(map(), :safe) :: map()
+  @spec atomorphiform!(map(), list()) :: map()
   @spec compactify(map()) :: {:ok, map()} | no_return
   @spec compactify!(map()) :: map() | no_return
   @spec compactiform!(map()) :: map() | no_return
@@ -131,7 +139,7 @@ defmodule Morphix do
 
   @doc """
 
-  Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps.
+  Takes a map as an argument and returns a tuple {:ok, map}, with string keys converted to atom keys. Does not examine nested maps.
 
   ### Examples
 
@@ -144,8 +152,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphify(map) when is_map map do
-    {:ok, atomog(map, &atomize_binary/1)}
+  def atomorphify(map) when is_map(map) do
+    {:ok, atomorphify!(map)}
   end
 
   @doc """
@@ -160,8 +168,73 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphify(map, :safe) when is_map map do
-    {:ok, (atomog map, &safe_atomize_binary/1)}
+  def atomorphify(map, :safe) when is_map(map) do
+    {:ok, atomorphify!(map, :safe)}
+  end
+
+  @doc """
+  Takes a map and a list of allowed strings to convert to atoms, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+
+  ### Examples:
+
+  ```
+  iex> Morphix.atomorphify(%{"allowed_key" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_key"])
+  {:ok, %{ "non_existent_atom" => "does_not", 1 => "is_ignored", allowed_key: "exists"}}
+
+  ```
+  """
+  def atomorphify(map, allowed) when is_map(map) and is_list(allowed) do
+    {:ok, atomorphify!(map, allowed)}
+  end
+
+  @doc """
+
+  Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps.
+
+  ### Examples
+
+  ```
+  iex> Morphix.atomorphify!(%{"this" => "map", "has" => %{"string" => "keys"}})
+  %{this: "map", has: %{"string" => "keys"}}
+
+  iex> Morphix.atomorphify!(%{1 => "2", "1" => 2, "one" => :two})
+  %{1 => "2", "1": 2, one: :two}
+
+  ```
+  """
+  def atomorphify!(map) when is_map(map) do
+    atomog(map, &atomize_binary/2)
+  end
+
+  @doc """
+  Takes a map and the `:safe` flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+
+  ### Examples:
+
+  ```
+  iex> :existing_atom
+  iex> Morphix.atomorphify!(%{"existing_atom" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, :safe)
+  %{"non_existent_atom" => "does_not", 1 => "is_ignored", existing_atom: "exists"}
+
+  ```
+  """
+  def atomorphify!(map, :safe) when is_map(map) do
+    atomog(map, &safe_atomize_binary/2)
+  end
+
+  @doc """
+  Takes a map and a list of allowed strings to convert to atoms, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+
+  ### Examples:
+
+  ```
+  iex> Morphix.atomorphify!(%{"allowed_key" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_key"])
+  %{"non_existent_atom" => "does_not", 1 => "is_ignored", allowed_key: "exists"}
+
+  ```
+  """
+  def atomorphify!(map, allowed) when is_map(map) and is_list(allowed) do
+    atomog(map, &safe_atomize_binary/2, allowed)
   end
 
   @doc """
@@ -178,8 +251,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform(map) when is_map map do
-    {:ok, depth_atomog(map, &atomize_binary/1)}
+  def atomorphiform(map) when is_map(map) do
+    {:ok, atomorphiform!(map)}
   end
 
   @doc """
@@ -197,8 +270,81 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform(map, :safe) when is_map map do
-    {:ok, depth_atomog(map, &safe_atomize_binary/1)}
+  def atomorphiform(map, :safe) when is_map(map) do
+    {:ok, atomorphiform!(map, :safe)}
+  end
+
+  @doc """
+  Takes a map and the `:safe` flag as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+
+  Works recursively on embedded maps.
+
+  ### Examples:
+
+  ```
+  iex> map = %{"memberof" => "atoms", "embed" => %{"will" => "convert", "thelist" => "to atoms"}}
+  iex> Morphix.atomorphiform(map, ["memberof", "thelist"])
+  {:ok, %{"embed" => %{"will" => "convert", thelist: "to atoms"}, memberof: "atoms"}}
+
+  ```
+  """
+  def atomorphiform(map, allowed) when is_map(map) do
+    {:ok, atomorphiform!(map, allowed)}
+  end
+
+  @doc """
+  Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys.
+
+  ### Examples:
+
+  ```
+  iex> Morphix.atomorphiform!(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
+  %{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"}
+
+  iex> Morphix.atomorphiform!(%{"this" => ["map", %{"has" => ["a", "list"]}], "inside" => "it"})
+  %{this: ["map", %{has: ["a", "list"]}], inside: "it"}
+
+  ```
+  """
+  def atomorphiform!(map) when is_map(map) do
+    depth_atomog(map, &atomize_binary/2)
+  end
+
+  @doc """
+  Takes a map and the `:safe` flag as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+
+  Works recursively on embedded maps.
+
+  ### Examples:
+
+  ```
+  iex> [:allowed, :values]
+  iex> map = %{"allowed" => "atoms", "embed" => %{"will" => "convert", "values" => "to atoms"}}
+  iex> Morphix.atomorphiform!(map, :safe)
+  %{"embed" => %{"will" => "convert", values: "to atoms"}, allowed: "atoms"}
+
+  ```
+  """
+  def atomorphiform!(map, :safe) when is_map(map) do
+    depth_atomog(map, &safe_atomize_binary/2)
+  end
+
+  @doc """
+  Takes a map and the `:safe` flag as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+
+  Works recursively on embedded maps.
+
+  ### Examples:
+
+  ```
+  iex> map = %{"memberof" => "atoms", "embed" => %{"will" => "convert", "thelist" => "to atoms"}}
+  iex> Morphix.atomorphiform!(map, ["memberof", "thelist"])
+  %{"embed" => %{"will" => "convert", thelist: "to atoms"}, memberof: "atoms"}
+
+  ```
+  """
+  def atomorphiform!(map, allowed) when is_map(map) do
+    depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
   defp process_list_item(item, safe_or_atomize) do
@@ -209,28 +355,28 @@ defmodule Morphix do
     end
   end
 
-  defp depth_atomog(map, safe_or_atomize) do
+  defp depth_atomog(map, safe_or_atomize, allowed \\ []) do
     atomkeys = fn({k, v}, acc) ->
       cond do
         is_map v ->
-          Map.put_new(acc, safe_or_atomize.(k), depth_atomog(v, safe_or_atomize))
+          Map.put_new(acc, safe_or_atomize.(k, allowed), depth_atomog(v, safe_or_atomize))
         is_list v ->
-          Map.put_new(acc, safe_or_atomize.(k), process_list_item(v, safe_or_atomize))
+          Map.put_new(acc, safe_or_atomize.(k, allowed), process_list_item(v, safe_or_atomize))
         true ->
-          Map.put_new(acc, safe_or_atomize.(k), v)
+          Map.put_new(acc, safe_or_atomize.(k, allowed), v)
       end
     end
     Enum.reduce(map, %{}, atomkeys)
   end
 
-  defp atomog(map, safe_or_atomize) do
+  defp atomog(map, safe_or_atomize, allowed \\ []) do
     atomkeys = fn({k, v}, acc) ->
-      Map.put_new(acc, safe_or_atomize.(k), v)
+      Map.put_new(acc, safe_or_atomize.(k, allowed), v)
     end
     Enum.reduce(map, %{}, atomkeys)
   end
 
-  defp atomize_binary(value) do
+  defp atomize_binary(value, []) do
     if is_binary(value) do
       String.to_atom(value)
     else
@@ -238,13 +384,21 @@ defmodule Morphix do
     end
   end
 
-  defp safe_atomize_binary(value) do
+  defp safe_atomize_binary(value, []) do
     if is_binary(value) do
       try do
         String.to_existing_atom(value)
       rescue
         _ -> value
       end
+    else
+      value
+    end
+  end
+
+  defp safe_atomize_binary(value, allowed) do
+    if is_binary(value) && Enum.member?(allowed, value) do
+      String.to_atom(value)
     else
       value
     end
