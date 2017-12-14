@@ -157,7 +157,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and the `:safe` flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+  Takes a map and the `:safe` flag and returns `{:ok, map}`, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
 
   ### Examples:
 
@@ -173,7 +173,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and a list of allowed strings to convert to atoms, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+  Takes a map and a list of allowed strings to convert to atoms and returns `{:ok, map}`, with string keys in the list converted to atoms. Ignores nested maps.
 
   ### Examples:
 
@@ -207,7 +207,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and the `:safe` flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+  Takes a map and the `:safe` flag and returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
 
   ### Examples:
 
@@ -223,7 +223,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and a list of allowed strings to convert to atoms, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
+  Takes a map and a list of allowed strings to convert to atoms and returns the same map, with string keys in the list converted to atoms. Ignores nested maps.
 
   ### Examples:
 
@@ -239,7 +239,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys.
+  Takes a map as an argument and returns `{:ok, map}`, with all string keys (including keys in nested maps) converted to atom keys.
 
   ### Examples:
 
@@ -276,7 +276,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and a list of allowed strings as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+  Takes a map and a list of allowed strings as arguments and returns `{:ok, map}`, with any strings that are in the list converted to atoms, and any strings that are not in the list left as strings.
 
   Works recursively on embedded maps.
 
@@ -312,7 +312,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and the `:safe` flag as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+  Takes a map and the `:safe` flag as arguments and returns the same map, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
 
   Works recursively on embedded maps.
 
@@ -331,7 +331,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and a list of allowed strings as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+  Takes a map and a list of allowed strings as arguments and returns the same map, with any strings that are in the list converted to atoms, and any strings that are not in the list left as strings.
 
   Works recursively on embedded maps.
 
