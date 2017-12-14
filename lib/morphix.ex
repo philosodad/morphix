@@ -139,7 +139,7 @@ defmodule Morphix do
 
   @doc """
 
-  Takes a map as an argument and returns a tuple {:ok, map}, with string keys converted to atom keys. Does not examine nested maps.
+  Takes a map as an argument and returns `{:ok, map}`, with string keys converted to atom keys. Does not examine nested maps.
 
   ### Examples
 
