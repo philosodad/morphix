@@ -3,6 +3,36 @@ defmodule MorphixTest do
   require Morphix
   doctest Morphix
 
+  test "atomorphify will atomize based on existing atoms" do
+    test_map = %{"existing_atom" => "exists",
+      "non_existent_atom" => "does_not", 1 => "is_ignored"}
+    expected_map = %{"non_existent_atom" => "does_not",
+      1 => "is_ignored", existing_atom: "exists"}
+
+    assert Morphix.atomorphify!(test_map, :safe) == expected_map
+  end
+
+  test "atomorphiform will atomize based on existing atoms" do
+    test_map = %{"allowed" => "atoms",
+      "embed" => %{"will" => "convert", "values" => "to atoms"}}
+
+    expected_map = %{"embed" => %{"will" => "convert", values: "to atoms"}, allowed: "atoms"}
+
+    assert Morphix.atomorphiform!(test_map, :safe) == expected_map
+  end
+
+  test "atomorphify will reject non-map parameters" do
+    assert_raise(FunctionClauseError, fn() -> Morphix.atomorphify("foo", ["foo", "bar"]) end)
+  end
+
+  test "atomorphify will reject second parameter that is not a list or :safe"  do
+    assert_raise(FunctionClauseError, fn() -> Morphix.atomorphify(%{"foo" => "foo"}, :foo) end)
+  end
+
+  test "atomorphify if the list has non-binary keys"  do
+    assert {:ok, %{1 => "foo"}} == Morphix.atomorphify(%{1 => "foo"}, [1, 2])
+  end
+
   test "atomorphiform will handle lists of nested maps" do
     test_map = %{
                   "this" =>

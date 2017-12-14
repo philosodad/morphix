@@ -64,17 +64,17 @@ defmodule Morphix do
   @spec morphify(tuple(), fun()) :: {:ok|:error, map() | String.t}
   @spec morphify!([any], fun()) :: map()
   @spec morphify!(tuple(), fun()) :: map()
+  @spec atomorphify(map()) :: {:ok, map()}
   @spec atomorphify(map(), :safe) :: {:ok, map()}
-  @spec atomorphify(map()) :: {:ok, map}
-  @spec atomorphify(map(), list()) :: {:ok, map}
-  @spec atomorphify!(map(), :safe) :: map()
+  @spec atomorphify(map(), list()) :: {:ok, map()}
   @spec atomorphify!(map()) :: map()
+  @spec atomorphify!(map(), :safe) :: map()
   @spec atomorphify!(map(), list()) :: map()
+  @spec atomorphiform(map()) :: {:ok, map()}
   @spec atomorphiform(map(), :safe) :: {:ok, map()}
-  @spec atomorphiform(map()) :: {:ok, map}
   @spec atomorphiform(map(), list()) :: {:ok, map()}
-  @spec atomorphiform!(map(), :safe) :: map()
   @spec atomorphiform!(map()) :: map()
+  @spec atomorphiform!(map(), :safe) :: map()
   @spec atomorphiform!(map(), list()) :: map()
   @spec compactify(map()) :: {:ok, map()} | no_return
   @spec compactify!(map()) :: map() | no_return
@@ -152,10 +152,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphify(map) when is_map map do
+  def atomorphify(map) when is_map(map) do
     {:ok, atomorphify!(map)}
-  rescue
-    e -> {:error, e}
   end
 
   @doc """
@@ -170,10 +168,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphify(map, :safe) when is_map map do
+  def atomorphify(map, :safe) when is_map(map) do
     {:ok, atomorphify!(map, :safe)}
-  rescue
-    e -> {:error, e}
   end
 
   @doc """
@@ -187,10 +183,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphify(map, allowed) when is_map map do
+  def atomorphify(map, allowed) when is_map(map) and is_list(allowed) do
     {:ok, atomorphify!(map, allowed)}
-  rescue
-    e -> {:error, e}
   end
 
   @doc """
@@ -208,7 +202,7 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphify!(map) when is_map map do
+  def atomorphify!(map) when is_map(map) do
     atomog(map, &atomize_binary/2)
   end
 
@@ -224,7 +218,7 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphify!(map, :safe) when is_map map do
+  def atomorphify!(map, :safe) when is_map(map) do
     atomog(map, &safe_atomize_binary/2)
   end
 
@@ -234,12 +228,12 @@ defmodule Morphix do
   ### Examples:
 
   ```
-  iex> Morphix.atomorphify!(%{"allowed_string" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_string"])
-  %{ "non_existent_atom" => "does_not", 1 => "is_ignored", allowed_string: "exists"}
+  iex> Morphix.atomorphify!(%{"allowed_key" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_key"])
+  %{"non_existent_atom" => "does_not", 1 => "is_ignored", allowed_key: "exists"}
 
   ```
   """
-  def atomorphify!(map, allowed) when is_map map do
+  def atomorphify!(map, allowed) when is_map(map) and is_list(allowed) do
     atomog(map, &safe_atomize_binary/2, allowed)
   end
 
@@ -257,10 +251,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform(map) when is_map map do
+  def atomorphiform(map) when is_map(map) do
     {:ok, atomorphiform!(map)}
-  rescue
-    e -> {:error, e}
   end
 
   @doc """
@@ -278,10 +270,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform(map, :safe) when is_map map do
+  def atomorphiform(map, :safe) when is_map(map) do
     {:ok, atomorphiform!(map, :safe)}
-  rescue
-    e -> {:error, e}
   end
 
   @doc """
@@ -298,10 +288,8 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform(map, allowed) when is_map map do
+  def atomorphiform(map, allowed) when is_map(map) do
     {:ok, atomorphiform!(map, allowed)}
-  rescue
-    e -> {:error, e}
   end
 
   @doc """
@@ -318,7 +306,7 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform!(map) when is_map map do
+  def atomorphiform!(map) when is_map(map) do
     depth_atomog(map, &atomize_binary/2)
   end
 
@@ -337,7 +325,7 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform!(map, :safe) when is_map map do
+  def atomorphiform!(map, :safe) when is_map(map) do
     depth_atomog(map, &safe_atomize_binary/2)
   end
 
@@ -355,7 +343,7 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform!(map, allowed) when is_map map do
+  def atomorphiform!(map, allowed) when is_map(map) do
     depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
