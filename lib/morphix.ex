@@ -233,6 +233,7 @@ defmodule Morphix do
 
   ```
   """
+  def atomorphify!(map, []) when is_map(map), do: map
   def atomorphify!(map, allowed) when is_map(map) and is_list(allowed) do
     atomog(map, &safe_atomize_binary/2, allowed)
   end
@@ -275,7 +276,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and the `:safe` flag as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+  Takes a map and a list of allowed strings as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
 
   Works recursively on embedded maps.
 
@@ -330,7 +331,7 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and the `:safe` flag as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
+  Takes a map and a list of allowed strings as arguments and returns `{:ok, map}`, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.
 
   Works recursively on embedded maps.
 
@@ -343,14 +344,15 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform!(map, allowed) when is_map(map) do
+  def atomorphiform!(map, []) when is_map(map), do: map
+  def atomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
     depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
-  defp process_list_item(item, safe_or_atomize) do
+  defp process_list_item(item, safe_or_atomize, allowed) do
     cond do
-      is_map item -> depth_atomog(item, safe_or_atomize)
-      is_list item -> Enum.map(item, fn(x) -> process_list_item(x, safe_or_atomize) end)
+      is_map item -> depth_atomog(item, safe_or_atomize, allowed)
+      is_list item -> Enum.map(item, fn(x) -> process_list_item(x, safe_or_atomize, allowed) end)
       true -> item
     end
   end
@@ -359,9 +361,9 @@ defmodule Morphix do
     atomkeys = fn({k, v}, acc) ->
       cond do
         is_map v ->
-          Map.put_new(acc, safe_or_atomize.(k, allowed), depth_atomog(v, safe_or_atomize))
+          Map.put_new(acc, safe_or_atomize.(k, allowed), depth_atomog(v, safe_or_atomize, allowed))
         is_list v ->
-          Map.put_new(acc, safe_or_atomize.(k, allowed), process_list_item(v, safe_or_atomize))
+          Map.put_new(acc, safe_or_atomize.(k, allowed), process_list_item(v, safe_or_atomize, allowed))
         true ->
           Map.put_new(acc, safe_or_atomize.(k, allowed), v)
       end
