@@ -21,6 +21,36 @@ defmodule MorphixTest do
     assert Morphix.atomorphiform!(test_map, :safe) == expected_map
   end
 
+  test "atomorphify will return map unchanged if given empty list" do
+    test_map = %{"allowed_top_key" => "atoms",
+      "embed" => %{"will" => "convert", "allowed_nested" => "to atoms"}}
+
+    assert Morphix.atomorphify!(test_map, []) == test_map
+  end
+
+  test "atomorphiform will return map unchanged if given empty list" do
+    test_map = %{"allowed_top_key" => "atoms",
+      "embed" => %{"will" => "convert", "allowed_nested" => "to atoms"}}
+
+    assert Morphix.atomorphiform!(test_map, []) == test_map
+  end
+
+  test "atomorphiform will atomize based on a list of allowed values" do
+    test_map = %{"allowed_top_key" => "atoms",
+      "embed" => %{"will" => "convert", "allowed_nested" => "to atoms"}}
+
+    expected_map = %{"embed" => %{"will" => "convert", allowed_nested: "to atoms"}, allowed_top_key: "atoms"}
+
+    assert Morphix.atomorphiform!(test_map, ["allowed_top_key", "allowed_nested"]) == expected_map
+  end
+
+  test "atomorphiform will atomize embedded lists" do
+    test_map = %{"this" => ["map", %{"has" => ["a", "list"]}], "inside" => "it"}
+    expected_map = %{"this" => ["map", %{has: ["a", "list"]}], inside: "it"}
+
+    assert Morphix.atomorphiform!(test_map, ["inside", "has"]) == expected_map
+  end
+
   test "atomorphify will reject non-map parameters" do
     assert_raise(FunctionClauseError, fn() -> Morphix.atomorphify("foo", ["foo", "bar"]) end)
   end
@@ -29,7 +59,15 @@ defmodule MorphixTest do
     assert_raise(FunctionClauseError, fn() -> Morphix.atomorphify(%{"foo" => "foo"}, :foo) end)
   end
 
-  test "atomorphify if the list has non-binary keys"  do
+  test "atomorphiform will reject non-map parameters" do
+    assert_raise(FunctionClauseError, fn() -> Morphix.atomorphiform("foo", ["foo", "bar"]) end)
+  end
+
+  test "atomorphiform will reject second parameter that is not a list or :safe"  do
+    assert_raise(FunctionClauseError, fn() -> Morphix.atomorphiform(%{"foo" => "foo"}, :foo) end)
+  end
+
+  test "atomorphify if the list has non-binary keys" do
     assert {:ok, %{1 => "foo"}} == Morphix.atomorphify(%{1 => "foo"}, [1, 2])
   end
 
