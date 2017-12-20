@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.2.0]
+### Added
+- added atomorphify!
+- added atomorphiform!
+
+### Changed
+- fixed error with empty lists in atomorphif* methods
+- updated documentation
+- improved testing
+
 ## [v0.1.0]
 ### Added
 - added `partiphify/2` function for partitioning lists
