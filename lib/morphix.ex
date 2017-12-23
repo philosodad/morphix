@@ -343,6 +343,14 @@ defmodule Morphix do
   %{"embed" => %{"will" => "convert", thelist: "to atoms"}, memberof: "atoms"}
 
   ```
+
+  ```
+  iex> map = %{"id" => "fooobarrr", "date_of_birth" => ~D[2014-04-14]}
+  %{"date_of_birth" => ~D[2014-04-14], "id" => "fooobarrr"}
+  iex> Morphix.atomorphiform!(map)
+  %{id: "fooobarrr", date_of_birth: ~D[2014-04-14]}
+  ```
+
   """
   def atomorphiform!(map, []) when is_map(map), do: map
   def atomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
@@ -360,6 +368,7 @@ defmodule Morphix do
   defp depth_atomog(map, safe_or_atomize, allowed \\ []) do
     atomkeys = fn({k, v}, acc) ->
       cond do
+        is_struct(v) -> Map.put_new(acc, safe_or_atomize.(k, allowed), v)
         is_map v ->
           Map.put_new(acc, safe_or_atomize.(k, allowed), depth_atomog(v, safe_or_atomize, allowed))
         is_list v ->
@@ -485,7 +494,7 @@ defmodule Morphix do
   {:ok, %{not_nil: "real value"}}
 
   iex> Morphix.compactify("won't work")
-  {:error, %BadMapError{term: "won't work"}} 
+  {:error, %BadMapError{term: "won't work"}}
 
   ```
   """
