@@ -60,8 +60,8 @@ defmodule Morphix do
 
   @spec morphiflat(map()) :: {:ok | :error, map() | String}
   @spec morphiflat!(map()) :: map()
-  @spec morphify([any], fun()) :: {:ok|:error, map() | String.t}
-  @spec morphify(tuple(), fun()) :: {:ok|:error, map() | String.t}
+  @spec morphify([any], fun()) :: {:ok | :error, map() | String.t()}
+  @spec morphify(tuple(), fun()) :: {:ok | :error, map() | String.t()}
   @spec morphify!([any], fun()) :: map()
   @spec morphify!(tuple(), fun()) :: map()
   @spec atomorphify(map()) :: {:ok, map()}
@@ -94,8 +94,8 @@ defmodule Morphix do
 
   ```
   """
-  def morphiflat! map do
-    flattn map
+  def morphiflat!(map) do
+    flattn(map)
   end
 
   @doc """
@@ -120,20 +120,22 @@ defmodule Morphix do
 
   ```
   """
-  def morphiflat(map) when is_map map do
-    {:ok, flattn map}
+  def morphiflat(map) when is_map(map) do
+    {:ok, flattn(map)}
   rescue
     exception -> {:error, Exception.message(exception)}
   end
+
   def morphiflat(not_map), do: {:error, "#{inspect(not_map)} is not a Map"}
 
-  defp flattn map do
-    not_maps = fn({k, v}, acc) ->
-      case is_map v do
+  defp flattn(map) do
+    not_maps = fn {k, v}, acc ->
+      case is_map(v) do
         false -> Map.put_new(acc, k, v)
         true -> Map.merge(acc, flattn(v))
       end
     end
+
     Enum.reduce(map, %{}, not_maps)
   end
 
@@ -234,6 +236,7 @@ defmodule Morphix do
   ```
   """
   def atomorphify!(map, []) when is_map(map), do: map
+
   def atomorphify!(map, allowed) when is_map(map) and is_list(allowed) do
     atomog(map, &safe_atomize_binary/2, allowed)
   end
@@ -353,37 +356,52 @@ defmodule Morphix do
 
   """
   def atomorphiform!(map, []) when is_map(map), do: map
+
   def atomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
     depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
   defp process_list_item(item, safe_or_atomize, allowed) do
     cond do
-      is_map item -> depth_atomog(item, safe_or_atomize, allowed)
-      is_list item -> Enum.map(item, fn(x) -> process_list_item(x, safe_or_atomize, allowed) end)
+      is_map(item) -> depth_atomog(item, safe_or_atomize, allowed)
+      is_list(item) -> Enum.map(item, fn x -> process_list_item(x, safe_or_atomize, allowed) end)
       true -> item
     end
   end
 
   defp depth_atomog(map, safe_or_atomize, allowed \\ []) do
-    atomkeys = fn({k, v}, acc) ->
+    atomkeys = fn {k, v}, acc ->
       cond do
-        is_struct(v) -> Map.put_new(acc, safe_or_atomize.(k, allowed), v)
-        is_map v ->
-          Map.put_new(acc, safe_or_atomize.(k, allowed), depth_atomog(v, safe_or_atomize, allowed))
-        is_list v ->
-          Map.put_new(acc, safe_or_atomize.(k, allowed), process_list_item(v, safe_or_atomize, allowed))
+        is_struct(v) ->
+          Map.put_new(acc, safe_or_atomize.(k, allowed), v)
+
+        is_map(v) ->
+          Map.put_new(
+            acc,
+            safe_or_atomize.(k, allowed),
+            depth_atomog(v, safe_or_atomize, allowed)
+          )
+
+        is_list(v) ->
+          Map.put_new(
+            acc,
+            safe_or_atomize.(k, allowed),
+            process_list_item(v, safe_or_atomize, allowed)
+          )
+
         true ->
           Map.put_new(acc, safe_or_atomize.(k, allowed), v)
       end
     end
+
     Enum.reduce(map, %{}, atomkeys)
   end
 
   defp atomog(map, safe_or_atomize, allowed \\ []) do
-    atomkeys = fn({k, v}, acc) ->
+    atomkeys = fn {k, v}, acc ->
       Map.put_new(acc, safe_or_atomize.(k, allowed), v)
     end
+
     Enum.reduce(map, %{}, atomkeys)
   end
 
@@ -452,10 +470,9 @@ defmodule Morphix do
   ```
   """
   def morphify!(enum, funct) when is_tuple(enum), do: morphify!(Tuple.to_list(enum), funct)
+
   def morphify!(enum, funct) do
-    Enum.reduce(enum,
-    %{},
-    fn(x, acc) -> Map.put(acc, funct.(x), x) end)
+    Enum.reduce(enum, %{}, fn x, acc -> Map.put(acc, funct.(x), x) end)
   end
 
   @doc """
@@ -477,7 +494,7 @@ defmodule Morphix do
 
   def compactify!(map) when is_map(map) do
     map
-    |> Enum.reject(fn({_k, v}) -> is_nil(v) || empty_map(v) end)
+    |> Enum.reject(fn {_k, v} -> is_nil(v) || empty_map(v) end)
     |> Enum.into(%{})
   end
 
@@ -520,7 +537,7 @@ defmodule Morphix do
   """
 
   def compactiform!(map) when is_map(map) do
-    compactor = fn({k, v}, acc) ->
+    compactor = fn {k, v}, acc ->
       cond do
         is_struct(v) -> Map.put_new(acc, k, v)
         is_map(v) and Enum.empty?(v) -> acc
@@ -529,6 +546,7 @@ defmodule Morphix do
         true -> Map.put_new(acc, k, v)
       end
     end
+
     map
     |> Enum.reduce(%{}, compactor)
     |> compactify!
@@ -565,36 +583,44 @@ defmodule Morphix do
   iex> Morphix.partiphify!([1,2,3,4,5,6], 4)
   [[3], [4], [5, 1], [6, 2]]
 
-  iex> Morphix.partiphify!(("abcdefghijklmnop" |> String.split("")), 4)
-  [["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"], ["", "a", "b", "c", "d"]]
+  iex> Morphix.partiphify!(("abcdefghijklmnop" |> String.split("", trim: true)), 4)
+  [["a", "b", "c", "d"], ["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"]]
 
   ```
   """
   def partiphify!(list, k) when is_list(list) and is_integer(k) do
-    ceil_div = fn(a, b) -> Float.ceil(a / b)  end
-    with chunk_size when chunk_size > 0 <- list
-                                           |> Enum.count()
-                                           |> Integer.floor_div(k),
-         true <- (list
-                 |> Enum.count()
-                 |> Integer.mod(k)
-                 |> ceil_div.(chunk_size)) > 0 do
+    ceil_div = fn a, b -> Float.ceil(a / b) end
+
+    with chunk_size when chunk_size > 0 <-
+           list
+           |> Enum.count()
+           |> Integer.floor_div(k),
+         true <-
+           list
+           |> Enum.count()
+           |> Integer.mod(k)
+           |> ceil_div.(chunk_size) > 0 do
       list
       |> into_buckets(k, chunk_size)
       |> distribute_extra()
     else
-      0 -> list = Enum.chunk(list, 1, 1, [])
-           empty_buckets = k - Enum.count(list)
-           Enum.reduce(1..empty_buckets, list, fn(_, acc) -> acc ++ [[]] end)
-      false -> chunk_size = list
-                            |> Enum.count()
-                            |> Integer.floor_div(k)
-               Enum.chunk(list, chunk_size, chunk_size, [])
+      0 ->
+        list = Enum.chunk_every(list, 1, 1, [])
+        empty_buckets = k - Enum.count(list)
+        Enum.reduce(1..empty_buckets, list, fn _, acc -> acc ++ [[]] end)
+
+      false ->
+        chunk_size =
+          list
+          |> Enum.count()
+          |> Integer.floor_div(k)
+
+        Enum.chunk_every(list, chunk_size, chunk_size, [])
     end
   end
 
   defp into_buckets(list, k, chunk_size) do
-    chunks = Enum.chunk(list, chunk_size, chunk_size, [])
+    chunks = Enum.chunk_every(list, chunk_size, chunk_size, [])
     extra_buckets = Enum.take(chunks, -(Enum.count(chunks) - k))
     k_buckets = chunks -- extra_buckets
     {extra_buckets, k_buckets}
@@ -608,8 +634,8 @@ defmodule Morphix do
   iex> Morphix.partiphify([1,2,3,4,5,6], 4)
   {:ok, [[3], [4], [5, 1], [6, 2]]}
 
-  iex> Morphix.partiphify(("abcdefghijklmnop" |> String.split("")), 4)
-  {:ok, [["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"], ["", "a", "b", "c", "d"]]}
+  iex> Morphix.partiphify(("abcdefghijklmnop" |> String.split("", trim: true)), 4)
+  {:ok, [["a", "b", "c", "d"], ["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"]]}
   ```
   """
   def partiphify(list, k) do
@@ -619,7 +645,7 @@ defmodule Morphix do
   end
 
   defp distribute(list, buckets) do
-    Enum.reduce(list, buckets, fn(item, buckets) ->
+    Enum.reduce(list, buckets, fn item, buckets ->
       [current_bucket | rest_of_buckets] = buckets
       new_bucket = [item | current_bucket]
       rest_of_buckets ++ [new_bucket]
@@ -637,7 +663,7 @@ defmodule Morphix do
   end
 
   defp empty_map(map) do
-    is_map(map) && (not Map.has_key?(map, :__struct__)) && Enum.empty?(map)
+    is_map(map) && not Map.has_key?(map, :__struct__) && Enum.empty?(map)
   end
 
   defp is_struct(s), do: is_map(s) and Map.has_key?(s, :__struct__)
