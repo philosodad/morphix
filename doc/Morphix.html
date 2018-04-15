@@ -5,8 +5,10 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.3">
-    <title>Morphix – morphix v0.1.0</title>
+    <title>Morphix – morphix v0.2.4</title>
     <link rel="stylesheet" href="dist/app-091c05798a.css" />
+    
+      <link rel="canonical" href="https://hexdocs.pm/morphix/Morphix.html" />
     
     <script src="dist/sidebar_items.js"></script>
   </head>
@@ -26,7 +28,7 @@
         morphix
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.1.0
+        v0.2.4
       </h2>
     </div>
     
@@ -58,7 +60,7 @@
 
 
       <h1>
-        <small class="visible-xs">morphix v0.1.0</small>
+        <small class="visible-xs">morphix v0.2.4</small>
         Morphix
         
         
@@ -89,10 +91,10 @@ iex&gt; Morphix.morphiflat! %{flatten: %{this: &quot;map&quot;}, o: &quot;k&quot
 <p><a href="#partiphify!/2"><code class="inline">partiphify!/2</code></a> and <a href="#partiphify/2"><code class="inline">partiphify/2</code></a> take a list <code class="inline">l</code> and an integer <code class="inline">k</code> and partition <code class="inline">l</code> into <code class="inline">k</code> sublists of balanced size. There will always be <code class="inline">k</code> lists, even if some must be empty.</p>
 <h3>Examples:</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.partiphify!([:a, :b, :c, :d, :e, :f], 4)
-[[:e, :a], [:f, :b], [:c], [:d]]
+[[:c], [:d], [:e, :a], [:f, :b]]
 
 iex&gt; Morphix.partiphify!([:a, :b, :c, :d, :e], 4)
-[[:e, :a], [:b], [:c], [:d]]
+[[:b], [:c], [:d], [:e, :a]]
 
 iex&gt; Morphix.partiphify!([:a, :b, :c, :d], 4)
 [[:a], [:b], [:c], [:d]]
@@ -124,16 +126,34 @@ iex&gt; Morphix.partiphify!([:a, :b, :c], 4)
     <a href="#atomorphiform/1">atomorphiform(map)</a>
   </div>
   
+    <div class="summary-synopsis"><p>Takes a map as an argument and returns <code class="inline">{:ok, map}</code>, with all string keys (including keys in nested maps) converted to atom keys</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#atomorphiform/2">atomorphiform(map, allowed)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a map and a list of allowed strings as arguments and returns <code class="inline">{:ok, map}</code>, with any strings that are in the list converted to atoms, and any strings that are not in the list left as strings</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#atomorphiform!/1">atomorphiform!(map)</a>
+  </div>
+  
     <div class="summary-synopsis"><p>Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#atomorphiform/2">atomorphiform(map, atom)</a>
+    <a href="#atomorphiform!/2">atomorphiform!(map, allowed)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Takes a map and the <code class="inline">:safe</code> flag as arguments and returns <code class="inline">{:ok, map}</code>, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings</p>
+    <div class="summary-synopsis"><p>Takes a map and a list of allowed strings as arguments and returns the same map, with any strings that are in the list converted to atoms, and any strings that are not in the list left as strings</p>
 </div>
   
 </div>
@@ -142,16 +162,34 @@ iex&gt; Morphix.partiphify!([:a, :b, :c], 4)
     <a href="#atomorphify/1">atomorphify(map)</a>
   </div>
   
+    <div class="summary-synopsis"><p>Takes a map as an argument and returns <code class="inline">{:ok, map}</code>, with string keys converted to atom keys. Does not examine nested maps</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#atomorphify/2">atomorphify(map, allowed)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes a map and a list of allowed strings to convert to atoms and returns <code class="inline">{:ok, map}</code>, with string keys in the list converted to atoms. Ignores nested maps</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#atomorphify!/1">atomorphify!(map)</a>
+  </div>
+  
     <div class="summary-synopsis"><p>Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#atomorphify/2">atomorphify(map, atom)</a>
+    <a href="#atomorphify!/2">atomorphify!(map, allowed)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Takes a map and the <code class="inline">:safe</code> flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps</p>
+    <div class="summary-synopsis"><p>Takes a map and a list of allowed strings to convert to atoms and returns the same map, with string keys in the list converted to atoms. Ignores nested maps</p>
 </div>
   
 </div>
@@ -284,7 +322,7 @@ iex&gt; Morphix.partiphify!([:a, :b, :c], 4)
     
   </div>
   <section class="docstring">
-    <p>Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys.</p>
+    <p>Takes a map as an argument and returns <code class="inline">{:ok, map}</code>, with all string keys (including keys in nested maps) converted to atom keys.</p>
 <h3>Examples:</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.atomorphiform(%{:this =&gt; %{map: %{&quot;has&quot; =&gt; &quot;a&quot;, :nested =&gt; &quot;string&quot;, :for =&gt;  %{a: :key}}}, &quot;the&quot; =&gt;  %{&quot;other&quot; =&gt; %{map: :does}}, as: &quot;well&quot;})
 {:ok,%{this: %{map: %{has: &quot;a&quot;, nested: &quot;string&quot;, for: %{a: :key}}}, the: %{other: %{map: :does}}, as: &quot;well&quot;} }
@@ -301,7 +339,7 @@ iex&gt; Morphix.atomorphiform(%{&quot;this&quot; =&gt; [&quot;map&quot;, %{&quot
     <a href="#atomorphiform/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">atomorphiform(map, atom)</span>
+    <span class="signature">atomorphiform(map, allowed)</span>
     
     
     
@@ -309,18 +347,82 @@ iex&gt; Morphix.atomorphiform(%{&quot;this&quot; =&gt; [&quot;map&quot;, %{&quot
         
           <pre>atomorphiform(map, :safe) :: {:ok, map}</pre>
         
+          <pre>atomorphiform(map, list) :: {:ok, map}</pre>
+        
       </div>
     
   </div>
   <section class="docstring">
-    <p>Takes a map and the <code class="inline">:safe</code> flag as arguments and returns <code class="inline">{:ok, map}</code>, with any strings that are existing atoms converted to atoms, and any strings that are not existing atoms left as strings.</p>
+    <p>Takes a map and a list of allowed strings as arguments and returns <code class="inline">{:ok, map}</code>, with any strings that are in the list converted to atoms, and any strings that are not in the list left as strings.</p>
 <p>Works recursively on embedded maps.</p>
 <h3>Examples:</h3>
-<pre><code class="iex elixir">iex&gt; [:allowed, :values]
-iex&gt; map = %{&quot;allowed&quot; =&gt; &quot;atoms&quot;, &quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, &quot;values&quot; =&gt; &quot;to atoms&quot;}}
-iex&gt; Morphix.atomorphiform(map, :safe)
-{:ok, %{&quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, values: &quot;to atoms&quot;}, allowed: &quot;atoms&quot;}}
+<pre><code class="iex elixir">iex&gt; map = %{&quot;memberof&quot; =&gt; &quot;atoms&quot;, &quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, &quot;thelist&quot; =&gt; &quot;to atoms&quot;}}
+iex&gt; Morphix.atomorphiform(map, [&quot;memberof&quot;, &quot;thelist&quot;])
+{:ok, %{&quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, thelist: &quot;to atoms&quot;}, memberof: &quot;atoms&quot;}}
 </code></pre>
+
+  </section>
+</div>
+<div class="detail" id="atomorphiform!/1">
+  
+  <div class="detail-header">
+    <a href="#atomorphiform!/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">atomorphiform!(map)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>atomorphiform!(map) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.atomorphiform!(%{:this =&gt; %{map: %{&quot;has&quot; =&gt; &quot;a&quot;, :nested =&gt; &quot;string&quot;, :for =&gt;  %{a: :key}}}, &quot;the&quot; =&gt;  %{&quot;other&quot; =&gt; %{map: :does}}, as: &quot;well&quot;})
+%{this: %{map: %{has: &quot;a&quot;, nested: &quot;string&quot;, for: %{a: :key}}}, the: %{other: %{map: :does}}, as: &quot;well&quot;}
+
+iex&gt; Morphix.atomorphiform!(%{&quot;this&quot; =&gt; [&quot;map&quot;, %{&quot;has&quot; =&gt; [&quot;a&quot;, &quot;list&quot;]}], &quot;inside&quot; =&gt; &quot;it&quot;})
+%{this: [&quot;map&quot;, %{has: [&quot;a&quot;, &quot;list&quot;]}], inside: &quot;it&quot;}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="atomorphiform!/2">
+  
+  <div class="detail-header">
+    <a href="#atomorphiform!/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">atomorphiform!(map, allowed)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>atomorphiform!(map, :safe) :: map</pre>
+        
+          <pre>atomorphiform!(map, list) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map and a list of allowed strings as arguments and returns the same map, with any strings that are in the list converted to atoms, and any strings that are not in the list left as strings.</p>
+<p>Works recursively on embedded maps.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; map = %{&quot;memberof&quot; =&gt; &quot;atoms&quot;, &quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, &quot;thelist&quot; =&gt; &quot;to atoms&quot;}}
+iex&gt; Morphix.atomorphiform!(map, [&quot;memberof&quot;, &quot;thelist&quot;])
+%{&quot;embed&quot; =&gt; %{&quot;will&quot; =&gt; &quot;convert&quot;, thelist: &quot;to atoms&quot;}, memberof: &quot;atoms&quot;}
+</code></pre>
+<pre><code class="iex elixir">iex&gt; map = %{&quot;id&quot; =&gt; &quot;fooobarrr&quot;, &quot;date_of_birth&quot; =&gt; ~D[2014-04-14]}
+%{&quot;date_of_birth&quot; =&gt; ~D[2014-04-14], &quot;id&quot; =&gt; &quot;fooobarrr&quot;}
+iex&gt; Morphix.atomorphiform!(map)
+%{id: &quot;fooobarrr&quot;, date_of_birth: ~D[2014-04-14]}</code></pre>
 
   </section>
 </div>
@@ -342,7 +444,7 @@ iex&gt; Morphix.atomorphiform(map, :safe)
     
   </div>
   <section class="docstring">
-    <p>Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps.</p>
+    <p>Takes a map as an argument and returns <code class="inline">{:ok, map}</code>, with string keys converted to atom keys. Does not examine nested maps.</p>
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.atomorphify(%{&quot;this&quot; =&gt; &quot;map&quot;, &quot;has&quot; =&gt; %{&quot;string&quot; =&gt; &quot;keys&quot;}})
 {:ok, %{this: &quot;map&quot;, has: %{&quot;string&quot; =&gt; &quot;keys&quot;}}}
@@ -359,7 +461,7 @@ iex&gt; Morphix.atomorphify(%{1 =&gt; &quot;2&quot;, &quot;1&quot; =&gt; 2, &quo
     <a href="#atomorphify/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">atomorphify(map, atom)</span>
+    <span class="signature">atomorphify(map, allowed)</span>
     
     
     
@@ -367,15 +469,73 @@ iex&gt; Morphix.atomorphify(%{1 =&gt; &quot;2&quot;, &quot;1&quot; =&gt; 2, &quo
         
           <pre>atomorphify(map, :safe) :: {:ok, map}</pre>
         
+          <pre>atomorphify(map, list) :: {:ok, map}</pre>
+        
       </div>
     
   </div>
   <section class="docstring">
-    <p>Takes a map and the <code class="inline">:safe</code> flag, returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.</p>
+    <p>Takes a map and a list of allowed strings to convert to atoms and returns <code class="inline">{:ok, map}</code>, with string keys in the list converted to atoms. Ignores nested maps.</p>
 <h3>Examples:</h3>
-<pre><code class="iex elixir">iex&gt; :existing_atom
-iex&gt; Morphix.atomorphify(%{&quot;existing_atom&quot; =&gt; &quot;exists&quot;, &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;}, :safe)
-{:ok, %{ &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;, existing_atom: &quot;exists&quot;}}
+<pre><code class="iex elixir">iex&gt; Morphix.atomorphify(%{&quot;allowed_key&quot; =&gt; &quot;exists&quot;, &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;}, [&quot;allowed_key&quot;])
+{:ok, %{ &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;, allowed_key: &quot;exists&quot;}}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="atomorphify!/1">
+  
+  <div class="detail-header">
+    <a href="#atomorphify!/1" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">atomorphify!(map)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>atomorphify!(map) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map as an argument and returns the same map with string keys converted to atom keys. Does not examine nested maps.</p>
+<h3>Examples</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.atomorphify!(%{&quot;this&quot; =&gt; &quot;map&quot;, &quot;has&quot; =&gt; %{&quot;string&quot; =&gt; &quot;keys&quot;}})
+%{this: &quot;map&quot;, has: %{&quot;string&quot; =&gt; &quot;keys&quot;}}
+
+iex&gt; Morphix.atomorphify!(%{1 =&gt; &quot;2&quot;, &quot;1&quot; =&gt; 2, &quot;one&quot; =&gt; :two})
+%{1 =&gt; &quot;2&quot;, &quot;1&quot;: 2, one: :two}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="atomorphify!/2">
+  
+  <div class="detail-header">
+    <a href="#atomorphify!/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">atomorphify!(map, allowed)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>atomorphify!(map, :safe) :: map</pre>
+        
+          <pre>atomorphify!(map, list) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes a map and a list of allowed strings to convert to atoms and returns the same map, with string keys in the list converted to atoms. Ignores nested maps.</p>
+<h3>Examples:</h3>
+<pre><code class="iex elixir">iex&gt; Morphix.atomorphify!(%{&quot;allowed_key&quot; =&gt; &quot;exists&quot;, &quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;}, [&quot;allowed_key&quot;])
+%{&quot;non_existent_atom&quot; =&gt; &quot;does_not&quot;, 1 =&gt; &quot;is_ignored&quot;, allowed_key: &quot;exists&quot;}
 </code></pre>
 
   </section>
@@ -464,7 +624,7 @@ iex&gt; Morphix.compactiform!(%{nil_nil: nil, not_nil: &quot;a value&quot;, nest
 {:ok, %{not_nil: &quot;real value&quot;}}
 
 iex&gt; Morphix.compactify(&quot;won&#39;t work&quot;)
-{:error, %BadMapError{term: &quot;won&#39;t work&quot;}} 
+{:error, %BadMapError{term: &quot;won&#39;t work&quot;}}
 </code></pre>
 
   </section>
@@ -645,10 +805,10 @@ iex&gt; Morphix.morphify([1,2], &amp;String.length/1)
     <p>Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible</p>
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.partiphify([1,2,3,4,5,6], 4)
-{:ok, [[5,1], [6,2], [3], [4]]}
+{:ok, [[3], [4], [5, 1], [6, 2]]}
 
 iex&gt; Morphix.partiphify((&quot;abcdefghijklmnop&quot; |&gt; String.split(&quot;&quot;)), 4)
-{:ok, [[&quot;&quot;, &quot;m&quot;, &quot;i&quot;, &quot;e&quot;, &quot;a&quot;], [&quot;n&quot;, &quot;j&quot;, &quot;f&quot;, &quot;b&quot;], [&quot;o&quot;, &quot;k&quot;, &quot;g&quot;, &quot;c&quot;], [&quot;p&quot;, &quot;l&quot;, &quot;h&quot;, &quot;d&quot;]]}</code></pre>
+{:ok, [[&quot;e&quot;, &quot;f&quot;, &quot;g&quot;, &quot;h&quot;], [&quot;i&quot;, &quot;j&quot;, &quot;k&quot;, &quot;l&quot;], [&quot;m&quot;, &quot;n&quot;, &quot;o&quot;, &quot;p&quot;], [&quot;&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]]}</code></pre>
 
   </section>
 </div>
@@ -673,10 +833,11 @@ iex&gt; Morphix.partiphify((&quot;abcdefghijklmnop&quot; |&gt; String.split(&quo
     <p>Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible</p>
 <h3>Examples</h3>
 <pre><code class="iex elixir">iex&gt; Morphix.partiphify!([1,2,3,4,5,6], 4)
-[[5,1], [6,2], [3], [4]]
+[[3], [4], [5, 1], [6, 2]]
 
 iex&gt; Morphix.partiphify!((&quot;abcdefghijklmnop&quot; |&gt; String.split(&quot;&quot;)), 4)
-[[&quot;&quot;, &quot;m&quot;, &quot;i&quot;, &quot;e&quot;, &quot;a&quot;], [&quot;n&quot;, &quot;j&quot;, &quot;f&quot;, &quot;b&quot;], [&quot;o&quot;, &quot;k&quot;, &quot;g&quot;, &quot;c&quot;], [&quot;p&quot;, &quot;l&quot;, &quot;h&quot;, &quot;d&quot;]]</code></pre>
+[[&quot;e&quot;, &quot;f&quot;, &quot;g&quot;, &quot;h&quot;], [&quot;i&quot;, &quot;j&quot;, &quot;k&quot;, &quot;l&quot;], [&quot;m&quot;, &quot;n&quot;, &quot;o&quot;, &quot;p&quot;], [&quot;&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]]
+</code></pre>
 
   </section>
 </div>
