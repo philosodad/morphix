@@ -4,8 +4,8 @@ defmodule Morphix.Mixfile do
   def project do
     [
       app: :morphix,
-      version: "0.2.1",
-      elixir: "~> 1.4",
+      version: "0.2.4",
+      elixir: ">= 1.4.0 and < 1.6.0",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       package: package(),

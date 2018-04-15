@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.2.3]
+### Changed
+- Elixir version locked to be >= 1.4 and < 1.6. 1.6+ contains changes to the `String.split` version that breaks tests.
+
 ## [v0.2.1]
 ### Changed
 - fixed bug where struct types are recursed in atomorphiform
