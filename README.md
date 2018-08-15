@@ -15,7 +15,7 @@ The package can be installed from hex.pm
 
     ```
     def deps do
-      [{:morphix, "~> 0.1.0"}]
+      [{:morphix, "~> 0.3.0"}]
     end
     ```
 
