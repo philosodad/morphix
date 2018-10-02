@@ -476,18 +476,24 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and removes keys that have nil values, or are empty maps.
+  Takes a map or list and removes keys or elements that have nil values, or are empty maps.
 
   ### Examples
   ```
   iex> Morphix.compactify!(%{nil_key: nil, not_nil: "nil"})
   %{not_nil: "nil"}
 
+  iex> Morphix.compactify!([1, nil, "string", %{key: :value}])
+  [1, "string", %{key: :value}]
+
+  iex> Morphix.compactify!([a: nil, b: 2, c: "string"])
+  [b: 2, c: "string"]
+
   iex> Morphix.compactify!(%{empty: %{}, not: "not"})
   %{not: "not"}
 
   iex> Morphix.compactify!({"not", "a map"})
-  ** (BadMapError) expected a map, got: {"not", "a map"}
+  ** (ArgumentError) expecting a map or a list, got: {"not", "a map"}
 
   ```
   """
@@ -498,8 +504,22 @@ defmodule Morphix do
     |> Enum.into(%{})
   end
 
-  def compactify!(not_map) do
-    raise(BadMapError, term: not_map)
+  def compactify!(list) when is_list(list) do
+    list
+    |> Keyword.keyword?()
+    |> compactify!(list)
+  end
+
+  def compactify!(not_map_or_list) do
+    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect not_map_or_list}")
+  end
+
+  defp compactify!(true, list) do
+    Enum.reject(list, fn({_k, v}) -> is_nil(v) end)
+  end
+
+  defp compactify!(false, list) do
+    Enum.reject(list, fn(elem)   -> is_nil(elem) end)
   end
 
   @doc """
@@ -510,14 +530,23 @@ defmodule Morphix do
   iex> Morphix.compactify(%{nil_key: nil, not_nil: "real value"})
   {:ok, %{not_nil: "real value"}}
 
+  iex> Morphix.compactify([1, nil, "string", %{key: :value}])
+  {:ok, [1, "string", %{key: :value}]}
+
+  iex> Morphix.compactify([a: nil, b: 2, c: "string"])
+  {:ok, [b: 2, c: "string"]}
+
+  iex> Morphix.compactify(%{empty: %{}, not: "not"})
+  {:ok, %{not: "not"}}
+
   iex> Morphix.compactify("won't work")
-  {:error, %BadMapError{term: "won't work"}}
+  {:error, %ArgumentError{message: "expecting a map or a list, got: \\"won't work\\""}}
 
   ```
   """
 
-  def compactify(map) do
-    {:ok, compactify!(map)}
+  def compactify(map_or_list) do
+    {:ok, compactify!(map_or_list)}
   rescue
     e -> {:error, e}
   end
