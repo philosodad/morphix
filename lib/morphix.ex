@@ -563,7 +563,7 @@ defmodule Morphix do
   %{not_nil: "a value", nested: %{other: "other"}}
 
   iex> Morphix.compactiform!([nil, "string", %{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}}, ["nested", nil, 2]])
-  ["string", %{not_nil: "a value", nested: %{other: "other"}}, "nested", 2]
+  ["string", %{not_nil: "a value", nested: %{other: "other"}}, ["nested", 2]]
 
   ```
   """
@@ -588,8 +588,7 @@ defmodule Morphix do
     compactor = fn elem, acc ->
       cond do
         is_list(elem) and Enum.empty?(elem) -> acc
-        is_list(elem) -> acc ++ compactiform!(elem)
-        is_map(elem) -> acc ++ [compactiform!(elem)]
+        is_list(elem) or is_map(elem) -> acc ++ [compactiform!(elem)]
         is_nil(elem) -> acc
         true -> acc ++ [elem]
       end
