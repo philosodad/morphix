@@ -476,18 +476,24 @@ defmodule Morphix do
   end
 
   @doc """
-  Takes a map and removes keys that have nil values, or are empty maps.
+  Takes a map or list and removes keys or elements that have nil values, or are empty maps.
 
   ### Examples
   ```
   iex> Morphix.compactify!(%{nil_key: nil, not_nil: "nil"})
   %{not_nil: "nil"}
 
+  iex> Morphix.compactify!([1, nil, "string", %{key: :value}])
+  [1, "string", %{key: :value}]
+
+  iex> Morphix.compactify!([a: nil, b: 2, c: "string"])
+  [b: 2, c: "string"]
+
   iex> Morphix.compactify!(%{empty: %{}, not: "not"})
   %{not: "not"}
 
   iex> Morphix.compactify!({"not", "a map"})
-  ** (BadMapError) expected a map, got: {"not", "a map"}
+  ** (ArgumentError) expecting a map or a list, got: {"not", "a map"}
 
   ```
   """
@@ -498,32 +504,55 @@ defmodule Morphix do
     |> Enum.into(%{})
   end
 
-  def compactify!(not_map) do
-    raise(BadMapError, term: not_map)
+  def compactify!(list) when is_list(list) do
+    list
+    |> Keyword.keyword?()
+    |> compactify!(list)
+  end
+
+  def compactify!(not_map_or_list) do
+    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect not_map_or_list}")
+  end
+
+  defp compactify!(true, list) do
+    Enum.reject(list, fn({_k, v}) -> is_nil(v) end)
+  end
+
+  defp compactify!(false, list) do
+    Enum.reject(list, fn(elem)   -> is_nil(elem) end)
   end
 
   @doc """
-  Takes a map and removes any keys that have nil values.
+  Takes a map or a list and removes any keys or elements that have nil values.
 
   ### Examples
   ```
   iex> Morphix.compactify(%{nil_key: nil, not_nil: "real value"})
   {:ok, %{not_nil: "real value"}}
 
+  iex> Morphix.compactify([1, nil, "string", %{key: :value}])
+  {:ok, [1, "string", %{key: :value}]}
+
+  iex> Morphix.compactify([a: nil, b: 2, c: "string"])
+  {:ok, [b: 2, c: "string"]}
+
+  iex> Morphix.compactify(%{empty: %{}, not: "not"})
+  {:ok, %{not: "not"}}
+
   iex> Morphix.compactify("won't work")
-  {:error, %BadMapError{term: "won't work"}}
+  {:error, %ArgumentError{message: "expecting a map or a list, got: \\"won't work\\""}}
 
   ```
   """
 
-  def compactify(map) do
-    {:ok, compactify!(map)}
+  def compactify(map_or_list) do
+    {:ok, compactify!(map_or_list)}
   rescue
     e -> {:error, e}
   end
 
   @doc """
-  Removes keys with nil values from nested maps, also eliminates empty maps.
+  Removes keys with nil values from nested maps, eliminates empty maps, and removes nil values from nested lists.
 
   ### Examples
   ```
@@ -533,6 +562,9 @@ defmodule Morphix do
   iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}})
   %{not_nil: "a value", nested: %{other: "other"}}
 
+  iex> Morphix.compactiform!([nil, "string", %{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}}, ["nested", nil, 2]])
+  ["string", %{not_nil: "a value", nested: %{other: "other"}}, ["nested", 2]]
+
   ```
   """
 
@@ -541,7 +573,7 @@ defmodule Morphix do
       cond do
         is_struct(v) -> Map.put_new(acc, k, v)
         is_map(v) and Enum.empty?(v) -> acc
-        is_map(v) -> Map.put_new(acc, k, compactiform!(v))
+        is_map(v) or is_list(v) -> Map.put_new(acc, k, compactiform!(v))
         is_nil(v) -> acc
         true -> Map.put_new(acc, k, v)
       end
@@ -552,20 +584,41 @@ defmodule Morphix do
     |> compactify!
   end
 
-  def compactiform!(not_map) do
-    raise(BadMapError, term: not_map)
+  def compactiform!(list) when is_list(list) do
+    compactor = fn elem, acc ->
+      cond do
+        is_list(elem) and Enum.empty?(elem) -> acc
+        is_list(elem) or is_map(elem) -> acc ++ [compactiform!(elem)]
+        is_nil(elem) -> acc
+        true -> acc ++ [elem]
+      end
+    end
+
+    list
+    |> Enum.reduce([], compactor)
+    |> compactify!
+  end
+
+  def compactiform!(not_map_or_list) do
+    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect not_map_or_list}")
   end
 
   @doc """
-  Removes keys with nil values from maps, handles nested maps and treats empty maps as nil values.
+  Removes keys with nil values from maps and nil elements from lists. It also handles nested maps and lists, and treats empty maps as nil values.
 
   ### Examples
   ```
   iex> Morphix.compactiform(%{a: nil, b: "not", c: %{d: nil, e: %{}, f: %{g: "value"}}})
   {:ok, %{b: "not", c: %{f: %{g: "value"}}}}
 
+  iex> Morphix.compactiform(%{has: %{a: ["list", "with", nil]}, and: ["a", %{nested: "map", with: nil}]})
+  {:ok, %{has: %{a: ["list", "with"]}, and: ["a", %{nested: "map"}]}}
+
+  iex> Morphix.compactiform(["list", %{a: "map", with: nil, and_empty: []}])
+  {:ok, ["list", %{a: "map", and_empty: []}]}
+
   iex> Morphix.compactiform(5)
-  {:error, %BadMapError{term: 5}}
+  {:error, %ArgumentError{message: "expecting a map or a list, got: 5"}}
 
   ```
   """
