@@ -56,7 +56,15 @@ defmodule Morphix do
 
   ```
 
+  `equaliform?/2` compares two ordered or unordered lists and returns `true` if they are equal.
+
+  ### Example:
+  iex> Morphix.equaliform?([1, 2, 3], [2, 3, 1])
+  true
+
   """
+
+  use Util.ListOperator
 
   @spec morphiflat(map()) :: {:ok | :error, map() | String}
   @spec morphiflat!(map()) :: map()
