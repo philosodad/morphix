@@ -1,7 +1,6 @@
 defmodule Util.ListOperator do
   @moduledoc false
 
-  #`equaliform?/2` compares two ordered or unordered lists for equality.
   defmacro __using__(_opts) do
     quote do
       @doc """
