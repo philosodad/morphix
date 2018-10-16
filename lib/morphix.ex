@@ -56,7 +56,21 @@ defmodule Morphix do
 
   ```
 
+  `equaliform?/2` compares two ordered or unordered lists and returns `true` if they are equal. It also handles nested elements.
+
+  ### Example:
+      iex> Morphix.equaliform?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [[:three, "two"], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
+      true
+
+  `equalify?/2` compares two ordered or unordered lists and returns `true` if they are equal.
+
+  ### Example:
+      iex> Morphix.equalify?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [["two", :three], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
+      true
+
   """
+
+  use Util.EqualityOperator
 
   @spec morphiflat(map()) :: {:ok | :error, map() | String}
   @spec morphiflat!(map()) :: map()
@@ -511,15 +525,15 @@ defmodule Morphix do
   end
 
   def compactify!(not_map_or_list) do
-    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect not_map_or_list}")
+    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect(not_map_or_list)}")
   end
 
   defp compactify!(true, list) do
-    Enum.reject(list, fn({_k, v}) -> is_nil(v) end)
+    Enum.reject(list, fn {_k, v} -> is_nil(v) end)
   end
 
   defp compactify!(false, list) do
-    Enum.reject(list, fn(elem)   -> is_nil(elem) end)
+    Enum.reject(list, fn elem -> is_nil(elem) end)
   end
 
   @doc """
@@ -600,7 +614,7 @@ defmodule Morphix do
   end
 
   def compactiform!(not_map_or_list) do
-    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect not_map_or_list}")
+    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect(not_map_or_list)}")
   end
 
   @doc """

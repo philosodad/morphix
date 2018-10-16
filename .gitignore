@@ -6,3 +6,4 @@ erl_crash.dump
 *.swo
 .tool-versions*
 /cover
+/doc
