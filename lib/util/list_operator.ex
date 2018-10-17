@@ -9,7 +9,7 @@ defmodule Util.ListOperator do
       ### Examples:
 
       ```
-      iex> Morphix.equaliform?([1, "two", :three, %{a: 1, c: "three", e: %{d: 4, b: 2}}], ["two", :three, 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
+      iex> Morphix.equaliform?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [["two", :three], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
       true
 
       iex> Morphix.equaliform?([1, "two", :three, %{a: 1, c: "three", e: %{g: 4, b: 2}}], ["two", :three, 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
