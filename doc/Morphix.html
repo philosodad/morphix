@@ -5,10 +5,10 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.18.3">
-    <title>Morphix – morphix v0.4.0</title>
+    <title>Morphix – morphix v0.5.0</title>
     <link rel="stylesheet" href="dist/app-091c05798a.css" />
     
-    <script src="dist/sidebar_items-dc60ae2f86.js"></script>
+    <script src="dist/sidebar_items-45a4f8fbb8.js"></script>
     
     
     
@@ -35,7 +35,7 @@
         morphix
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.4.0
+        v0.5.0
       </h2>
     </div>
     
@@ -69,7 +69,7 @@
 
 
       <h1>
-        <small class="visible-xs">morphix v0.4.0</small>
+        <small class="visible-xs">morphix v0.5.0</small>
         Morphix
         
       </h1>
@@ -126,6 +126,17 @@ iex&gt; Morphix.partiphify!([:a, :b, :c, :d], 4)
 iex&gt; Morphix.partiphify!([:a, :b, :c], 4)
 [[:a], [:b], [:c], []]
 </code></pre>
+<p><a href="#equaliform?/2"><code class="inline">equaliform?/2</code></a> compares two ordered or unordered lists and returns <code class="inline">true</code> if they are equal.</p>
+<h3 id="module-example" class="section-heading">
+  <a href="#module-example" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Example:
+</h3>
+
+<pre><code class="iex elixir">iex&gt; Morphix.equaliform?([1, [&quot;two&quot;, :three], %{a: 1, c: &quot;three&quot;, e: %{d: 4, b: 2}}], [[&quot;two&quot;, :three], 1, %{c: &quot;three&quot;, a: 1, e: %{b: 2, d: 4}}])
+true
+
+iex&gt; Morphix.equaliform?(%{a: 1, b: 2, c: 3}, %{b: 2, c: 3, a: 1})
+** (ArgumentError) expecting a list for each parameter, got: %{a: 1, b: 2, c: 3}, %{a: 1, b: 2, c: 3}</code></pre>
 
         </section>
       
@@ -251,6 +262,15 @@ iex&gt; Morphix.partiphify!([:a, :b, :c], 4)
   </div>
   
     <div class="summary-synopsis"><p>Takes a map or list and removes keys or elements that have nil values, or are empty maps</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#equaliform?/2">equaliform?(list1, list2)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Takes two ordered or unordered lists and returns <code class="inline">true</code> if they are equal</p>
 </div>
   
 </div>
@@ -783,6 +803,45 @@ iex&gt; Morphix.compactify!(%{empty: %{}, not: &quot;not&quot;})
 
 iex&gt; Morphix.compactify!({&quot;not&quot;, &quot;a map&quot;})
 ** (ArgumentError) expecting a map or a list, got: {&quot;not&quot;, &quot;a map&quot;}
+</code></pre>
+
+  </section>
+</div>
+<div class="detail" id="equaliform?/2">
+  
+  
+  <div class="detail-header">
+    <a href="#equaliform?/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">equaliform?(list1, list2)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>equaliform?(<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()) ::
+  <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">boolean</a>() | %ArgumentError{__exception__: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>(), message: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>()}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Takes two ordered or unordered lists and returns <code class="inline">true</code> if they are equal.</p>
+<h3 id="equaliform?/2-examples" class="section-heading">
+  <a href="#equaliform?/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples:
+</h3>
+
+<pre><code class="iex elixir">iex&gt; Morphix.equaliform?([1, [&quot;two&quot;, :three], %{a: 1, c: &quot;three&quot;, e: %{d: 4, b: 2}}], [[&quot;two&quot;, :three], 1, %{c: &quot;three&quot;, a: 1, e: %{b: 2, d: 4}}])
+true
+
+iex&gt; Morphix.equaliform?([1, &quot;two&quot;, :three, %{a: 1, c: &quot;three&quot;, e: %{g: 4, b: 2}}], [&quot;two&quot;, :three, 1, %{c: &quot;three&quot;, a: 1, e: %{b: 2, d: 4}}])
+false
+
+iex&gt; Morphix.equaliform?(%{a: 1, b: 2, c: 3}, %{b: 2, c: 3, a: 1})
+** (ArgumentError) expecting a list for each parameter, got: %{a: 1, b: 2, c: 3}, %{a: 1, b: 2, c: 3}
 </code></pre>
 
   </section>
