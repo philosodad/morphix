@@ -35,7 +35,7 @@ defmodule Morphix do
 
   ```
 
-  `compactify` and `compactiform` take a map as an input and return a filtered map, removing any keys with nil values or with an empty map as a value.
+  `compactify` and `compactiform` take a map or list as an input and returns a filtered map or list, removing any keys or elements with nil values or with an empty map as a value.
 
   `partiphify!/2` and `partiphify/2` take a list `l` and an integer `k` and partition `l` into `k` sublists of balanced size. There will always be `k` lists, even if some must be empty.
 
@@ -87,10 +87,10 @@ defmodule Morphix do
   @spec atomorphiform!(map()) :: map()
   @spec atomorphiform!(map(), :safe) :: map()
   @spec atomorphiform!(map(), list()) :: map()
-  @spec compactify(map()) :: {:ok, map()} | no_return
-  @spec compactify!(map()) :: map() | no_return
-  @spec compactiform!(map()) :: map() | no_return
-  @spec compactiform(map()) :: {:ok, map()} | {:error, %BadMapError{}}
+  @spec compactify(map() | list()) :: {:ok, map()} | {:ok, list()} | {:error, %ArgumentError{}}
+  @spec compactify!(map() | list()) :: map() | list() | %ArgumentError{}
+  @spec compactiform!(map() | list()) :: map() | list() | %ArgumentError{}
+  @spec compactiform(map() | list()) :: {:ok, map()} | {:ok, list()} | {:error, %ArgumentError{}}
   @spec partiphify!(list(), integer) :: [list[any]] | no_return
   @spec partiphify(list(), integer) :: {:ok, [list[any]]} | {:error, term}
 
