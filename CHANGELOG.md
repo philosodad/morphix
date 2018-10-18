@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.4.0]
+### Changed
+- compactify and compactiform now remove nil elements from lists
+
 ## [v0.3.0]
 ### Changed
 - Partiphify now uses `chunk_every` instead of deprecated `Enum.chunk` method
