@@ -133,4 +133,96 @@ defmodule MorphixTest do
 
     assert Morphix.compactiform(test_map) == {:ok, expected_map}
   end
+
+  describe "equaliform?" do
+    setup do
+      list1 = [
+        1,
+        ["two", "three" , "four"],
+        %{response: {:ok, true}, a: "one", e: "five"},
+        %{response: {:ok, true}, a: 1, e: 5},
+        "six",
+        [f: %{g: 7, h: 8, i: 9}, j: 10],
+        {:error, false}
+      ]
+
+      keyword_list1 = [
+        a: 1,
+        b: ["two", "three" , "four"],
+        c: %{response: {:ok, true}, a: "one", e: "five"},
+        d: %{response: {:ok, true}, a: 1, e: 5},
+        e: "six",
+        f: [f: %{g: 7, h: 8, i: 9}, j: 10],
+        g: {:error, false}
+      ]
+
+      {:ok, list1: list1, keyword_list1: keyword_list1}
+    end
+
+    test "will return true for equal unordered lists", context do
+      list2 = [
+        ["three" , "four", "two"],
+        %{e: 5, response: {:ok, true}, a: 1},
+        [j: 10, f: %{g: 7, i: 9,  h: 8}],
+        {:error, false},
+        "six",
+        %{response: {:ok, true}, a: "one", e: "five"},
+        1
+      ]
+
+      keyword_list2 = [
+        b: ["three" , "four", "two"],
+        d: %{e: 5, response: {:ok, true}, a: 1},
+        f: [j: 10, f: %{i: 9, g: 7, h: 8}],
+        g: {:error, false},
+        e: "six",
+        c: %{a: "one", response: {:ok, true}, e: "five"},
+        a: 1
+      ]
+
+      assert Morphix.equaliform?(context.list1, list2) == true
+      assert Morphix.equaliform?(context.keyword_list1, keyword_list2) == true
+    end
+
+    test "will return false for unequal unordered lists with nested values", context do
+      list2 = [
+        ["three" , "four", "two"],
+        %{e: 6, response: {:ok, true}, a: 1},
+        [j: 10, f: %{g: 7, i: 9, h: 8}],
+        {:error, false},
+        "six",
+        %{response: {:ok, true}, a: "one", e: "five"},
+        1
+      ]
+
+      keyword_list2 = [
+        b: ["three" , "four", "two"],
+        d: %{e: 5, response: {:ok, true}, a: 1},
+        f: [j: 10, f: %{g: 7, h: 8, i: 2}],
+        g: {:error, false},
+        e: "six",
+        c: %{response: {:ok, true}, a: "one", e: "five"},
+        a: 1
+      ]
+
+      assert Morphix.equaliform?(context.list1, list2) == false
+      assert Morphix.equaliform?(context.keyword_list1, keyword_list2) == false
+    end
+
+    test "returns an ArgumentError when arguments are not lists", context do
+      not_lists = [
+        %{response: {:ok, true}, a: 1, e: 5},
+        {:ok, true},
+        "four",
+        1..100,
+        14
+      ]
+
+      [param1, param2] = not_lists |> Enum.take_random(2)
+
+      assert_raise ArgumentError, fn -> Morphix.equaliform?(param1, param2) end
+      assert_raise ArgumentError, fn -> Morphix.equaliform?(context.list1, param2) end
+      assert_raise ArgumentError, fn -> Morphix.equaliform?(param1, context.keyword_list1) end
+    end
+  end
 end

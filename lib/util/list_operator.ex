@@ -23,14 +23,35 @@ defmodule Util.ListOperator do
 
       @spec equaliform?(list(), list()) :: boolean | %ArgumentError{}
       def equaliform?(list1, list2) when is_list(list1) and is_list(list2) do
-        Enum.sort(list1) == Enum.sort(list2)
+        sort_elem(list1) == sort_elem(list2)
       end
 
       def equaliform?(not_list1, not_list2) do
         raise(
           ArgumentError,
-          message: "expecting a list for each parameter, got: #{inspect not_list1}, #{inspect not_list2}"
+          message: "expecting a list for each parameter, "
+          <> "got: #{inspect not_list1}, #{inspect not_list2}"
         )
+      end
+
+      defp sort_elem(list) when is_list(list) do
+        list
+        |> Keyword.keyword?()
+        |> sort_elem(list)
+      end
+
+      defp sort_elem(elem), do: elem
+
+      defp sort_elem(true, list) do
+        list
+        |> Enum.reduce([], fn({k, v}, acc) -> acc ++ [sort_elem(v)] end)
+        |> Enum.sort()
+      end
+
+      defp sort_elem(false, list) do
+        list
+        |> Enum.reduce([], fn(elem, acc) -> acc ++ [sort_elem(elem)] end)
+        |> Enum.sort()
       end
     end
   end
