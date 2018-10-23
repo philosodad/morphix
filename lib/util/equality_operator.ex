@@ -28,8 +28,8 @@ defmodule Util.EqualityOperator do
         equaliform?(both_enumerables?(any1, any2), any1, any2)
       end
 
-      def equaliform?(true, enum1, enum2), do: sort_elem(enum1) == sort_elem(enum2)
-      def equaliform?(false, any1, any2),  do: any1 == any2
+      defp equaliform?(true, enum1, enum2), do: sort_elem(enum1) == sort_elem(enum2)
+      defp equaliform?(false, any1, any2),  do: any1 == any2
 
       @doc """
       Takes two ordered or unordered elemets and returns `true` if they are equal.
@@ -55,8 +55,8 @@ defmodule Util.EqualityOperator do
         equalify?(both_enumerables?(any1, any2), any1, any2)
       end
 
-      def equalify?(true, enum1, enum2), do: Enum.sort(enum1) == Enum.sort(enum2)
-      def equalify?(false, any1, any2),  do: any1 == any2
+      defp equalify?(true, enum1, enum2), do: Enum.sort(enum1) == Enum.sort(enum2)
+      defp equalify?(false, any1, any2),  do: any1 == any2
 
       defp both_enumerables?(any1, any2) do
         case Enumerable.impl_for(any1) && Enumerable.impl_for(any2) do
