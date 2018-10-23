@@ -40,6 +40,12 @@ defmodule Util.ListOperator do
         |> sort_elem(list)
       end
 
+      defp sort_elem(map) when is_map(map) do
+        map
+        |> Enum.reduce(%{}, fn({k, v}, acc) -> Map.put(acc, k, sort_elem(v)) end)
+        |> Enum.sort()
+      end
+
       defp sort_elem(elem), do: elem
 
       defp sort_elem(true, list) do

@@ -139,7 +139,7 @@ defmodule MorphixTest do
       list1 = [
         1,
         ["two", "three" , "four"],
-        %{response: {:ok, true}, a: "one", e: "five"},
+        %{response: {:ok, true}, a: "one", d: [1, 2, 3], e: "five"},
         %{response: {:ok, true}, a: 1, e: 5},
         "six",
         [f: %{g: 7, h: 8, i: 9}, j: 10],
@@ -166,7 +166,7 @@ defmodule MorphixTest do
         [j: 10, f: %{g: 7, i: 9,  h: 8}],
         {:error, false},
         "six",
-        %{response: {:ok, true}, a: "one", e: "five"},
+        %{response: {:ok, true}, a: "one", e: "five", d: [3, 2, 1]},
         1
       ]
 
@@ -191,7 +191,7 @@ defmodule MorphixTest do
         [j: 10, f: %{g: 7, i: 9, h: 8}],
         {:error, false},
         "six",
-        %{response: {:ok, true}, a: "one", e: "five"},
+        %{response: {:ok, true}, a: "one", e: "five", d: [3, 2, 1]},
         1
       ]
 
