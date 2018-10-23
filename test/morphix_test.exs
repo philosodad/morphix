@@ -159,7 +159,7 @@ defmodule MorphixTest do
       {:ok, list1: list1, keyword_list1: keyword_list1}
     end
 
-    test "will return true for equal unordered lists", context do
+    test "will return true for equal unordered elements", context do
       list2 = [
         ["three" , "four", "two"],
         %{e: 5, response: {:ok, true}, a: 1},
@@ -182,9 +182,24 @@ defmodule MorphixTest do
 
       assert Morphix.equaliform?(context.list1, list2) == true
       assert Morphix.equaliform?(context.keyword_list1, keyword_list2) == true
+
+      assert Morphix.equaliform?(
+        [1, 2, [3, 4, 5]],
+        [1, 2, [3, 5, 4]]
+      ) == true
+
+      assert Morphix.equaliform?(
+        %{a: [1, 2, 3], b: [1, 2, 3]},
+        %{a: [1, 2, 3], b: [3, 2, 1]}
+      ) == true
+
+      assert Morphix.equaliform?(
+        {123, :ok, true, %{a: [4, 5, 6]}},
+        {true, :ok, 123, %{a: [5, 4, 6]}}
+      ) == true
     end
 
-    test "will return false for unequal unordered lists with nested values", context do
+    test "will return false for unequal unordered elements with nested values", context do
       list2 = [
         ["three" , "four", "two"],
         %{e: 6, response: {:ok, true}, a: 1},
@@ -208,21 +223,39 @@ defmodule MorphixTest do
       assert Morphix.equaliform?(context.list1, list2) == false
       assert Morphix.equaliform?(context.keyword_list1, keyword_list2) == false
     end
+  end
 
-    test "returns an ArgumentError when arguments are not lists", context do
-      not_lists = [
-        %{response: {:ok, true}, a: 1, e: 5},
-        {:ok, true},
-        "four",
-        1..100,
-        14
-      ]
+  describe "equalify" do
+    test "returns false when elements are the same, but nested values are not in the same order" do
+      assert Morphix.equalify?(
+        [1, 2, [3, 4, 5]],
+        [1, 2, [3, 5, 4]]
+      ) == false
 
-      [param1, param2] = not_lists |> Enum.take_random(2)
+      assert Morphix.equalify?(
+        %{a: [1, 2, 3], b: [1, 2, 3]},
+        %{a: [1, 2, 3], b: [3, 2, 1]}
+      ) == false
 
-      assert_raise ArgumentError, fn -> Morphix.equaliform?(param1, param2) end
-      assert_raise ArgumentError, fn -> Morphix.equaliform?(context.list1, param2) end
-      assert_raise ArgumentError, fn -> Morphix.equaliform?(param1, context.keyword_list1) end
+      assert Morphix.equalify?(
+        {123, :ok, true, %{a: [4, 5, 6]}},
+        {true, :ok, 123, %{a: [5, 4, 6]}}
+      ) == false
+    end
+
+    test "returns true when elements are the same, regardless of order" do
+      assert Morphix.equalify?(
+        [1, :three, "two", %{a: [4, 5, 6]}],
+        [1, "two", %{a: [4, 5, 6]}, :three]
+      ) == true
+
+      assert Morphix.equalify?(
+        %{a: 1, c: :three, b: "two"},
+        %{b: "two", c: :three, a: 1}
+      ) == true
+
+      assert Morphix.equalify?({:ok, true, 123}, {true, :ok, 123}) == true
+      assert Morphix.equalify?(123, 123) == true
     end
   end
 end
