@@ -20,8 +20,8 @@ defmodule Util.EqualityOperator do
       """
 
       @spec equaliform?(any(), any()) :: boolean
-      def equaliform?(tuple1, tuple2) when is_tuple(tuple1) and is_tuple(tuple2) do
-        equaliform?(Tuple.to_list(tuple1), Tuple.to_list(tuple2))
+      def equaliform?(any1, any2) when is_tuple(any1) and is_tuple(any2) do
+        equaliform?(Tuple.to_list(any1), Tuple.to_list(any2))
       end
 
       def equaliform?(any1, any2) do
@@ -47,8 +47,8 @@ defmodule Util.EqualityOperator do
       """
 
       @spec equalify?(any(), any()) :: boolean
-      def equalify?(tuple1, tuple2) when is_tuple(tuple1) and is_tuple(tuple2) do
-        equalify?(Tuple.to_list(tuple1), Tuple.to_list(tuple2))
+      def equalify?(any1, any2) when is_tuple(any1) and is_tuple(any2) do
+        equalify?(Tuple.to_list(any1), Tuple.to_list(any2))
       end
 
       def equalify?(any1, any2) do
