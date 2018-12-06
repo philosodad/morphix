@@ -361,9 +361,6 @@ defmodule Morphix do
     depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
-
-
-
   def stringomorphiform!(map) when is_map(map) do
     srecurse(map, &stringify_all/2)
   end
@@ -373,9 +370,6 @@ defmodule Morphix do
   def stringomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
     srecurse(map, &stringify_all/2, allowed)
   end
-
-
-  ####----
 
   defp stringify_all(value, []) do
     if is_atom(value) do
@@ -397,17 +391,15 @@ defmodule Morphix do
     end
   end
 
-
-
-  defp sprocess_list_item(item, helper , allowed) do
+  defp sprocess_list_item(item, helper, allowed) do
     cond do
-      is_map(item) -> srecurse(item, helper , allowed)
-      is_list(item) -> Enum.map(item, fn x -> sprocess_list_item(x, helper , allowed) end)
+      is_map(item) -> srecurse(item, helper, allowed)
+      is_list(item) -> Enum.map(item, fn x -> sprocess_list_item(x, helper, allowed) end)
       true -> item
     end
   end
 
-  defp srecurse(map, helper , allowed \\ []) do
+  defp srecurse(map, helper, allowed \\ []) do
     stringkeys = fn {k, v}, acc ->
       cond do
         is_struct(v) ->
@@ -434,23 +426,6 @@ defmodule Morphix do
 
     Enum.reduce(map, %{}, stringkeys)
   end
-
-
-
-
-
-
-
-
-
-
-
-
-
-  #### -----
-
-
-
 
   defp process_list_item(item, safe_or_atomize, allowed) do
     cond do
@@ -602,15 +577,15 @@ defmodule Morphix do
   end
 
   def compactify!(not_map_or_list) do
-    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect not_map_or_list}")
+    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect(not_map_or_list)}")
   end
 
   defp compactify!(true, list) do
-    Enum.reject(list, fn({_k, v}) -> is_nil(v) end)
+    Enum.reject(list, fn {_k, v} -> is_nil(v) end)
   end
 
   defp compactify!(false, list) do
-    Enum.reject(list, fn(elem)   -> is_nil(elem) end)
+    Enum.reject(list, fn elem -> is_nil(elem) end)
   end
 
   @doc """
@@ -691,7 +666,7 @@ defmodule Morphix do
   end
 
   def compactiform!(not_map_or_list) do
-    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect not_map_or_list}")
+    raise(ArgumentError, message: "expecting a map or a list, got: #{inspect(not_map_or_list)}")
   end
 
   @doc """
