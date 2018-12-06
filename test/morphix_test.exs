@@ -267,13 +267,15 @@ defmodule MorphixTest do
         "the" => "other",
         "how" => %{
           "heck" => nil,
-          "empty" => %{"empty" => %{"empty" => %{}}, "blank" => nil, "empte" => %{"sort" => %{}, "of"=> nil}}
+          "empty" => %{
+            "empty" => %{"empty" => %{}},
+            "blank" => nil,
+            "empte" => %{"sort" => %{}, "of" => nil}
+          }
         }
       }
-
       assert Morphix.stringomorphiform!(test_map) == expected_map
     end
-
 
     test "stringmorphiphorm will work (filtering allowed)" do
       time = DateTime.utc_now()
@@ -296,9 +298,9 @@ defmodule MorphixTest do
           "heck" => nil,
           :empty => %{blank: nil, empte: %{of: nil, sort: %{}}, empty: %{empty: %{}}}
         }
-      }
 
-      assert Morphix.stringomorphiform!(test_map, [:this,:that,:the, :how, :heck ]) == expected_map
+      }
+      assert Morphix.stringomorphiform!(test_map, [:this, :that, :the, :how, :heck]) == expected_map
     end
   end
 end
