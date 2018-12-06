@@ -361,6 +361,97 @@ defmodule Morphix do
     depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
+
+
+
+  def stringomorphiform!(map) when is_map(map) do
+    srecurse(map, &stringify_all/2)
+  end
+
+  def stringomorphiform!(map, []) when is_map(map), do: map
+
+  def stringomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
+    srecurse(map, &stringify_all/2, allowed)
+  end
+
+
+  ####----
+
+  defp stringify_all(value, []) do
+    if is_atom(value) do
+      try do
+        to_string(value)
+      rescue
+        _ -> value
+      end
+    else
+      value
+    end
+  end
+
+  defp stringify_all(value, allowed) do
+    if is_atom(value) && Enum.member?(allowed, value) do
+      to_string(value)
+    else
+      value
+    end
+  end
+
+
+
+  defp sprocess_list_item(item, helper , allowed) do
+    cond do
+      is_map(item) -> srecurse(item, helper , allowed)
+      is_list(item) -> Enum.map(item, fn x -> sprocess_list_item(x, helper , allowed) end)
+      true -> item
+    end
+  end
+
+  defp srecurse(map, helper , allowed \\ []) do
+    stringkeys = fn {k, v}, acc ->
+      cond do
+        is_struct(v) ->
+          Map.put_new(acc, helper.(k, allowed), v)
+
+        is_map(v) ->
+          Map.put_new(
+            acc,
+            helper.(k, allowed),
+            srecurse(v, helper, allowed)
+          )
+
+        is_list(v) ->
+          Map.put_new(
+            acc,
+            helper.(k, allowed),
+            sprocess_list_item(v, helper, allowed)
+          )
+
+        true ->
+          Map.put_new(acc, helper.(k, allowed), v)
+      end
+    end
+
+    Enum.reduce(map, %{}, stringkeys)
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+  #### -----
+
+
+
+
   defp process_list_item(item, safe_or_atomize, allowed) do
     cond do
       is_map(item) -> depth_atomog(item, safe_or_atomize, allowed)
