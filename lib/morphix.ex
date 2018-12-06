@@ -82,6 +82,8 @@ defmodule Morphix do
   @spec atomorphify(map(), :safe) :: {:ok, map()}
   @spec atomorphify(map(), list()) :: {:ok, map()}
   @spec atomorphify!(map()) :: map()
+  @spec stringmorphify!(map()) :: map()
+  @spec stringmorphify!(map(), list()) :: map()
   @spec atomorphify!(map(), :safe) :: map()
   @spec atomorphify!(map(), list()) :: map()
   @spec atomorphiform(map()) :: {:ok, map()}
@@ -90,6 +92,8 @@ defmodule Morphix do
   @spec atomorphiform!(map()) :: map()
   @spec atomorphiform!(map(), :safe) :: map()
   @spec atomorphiform!(map(), list()) :: map()
+  @spec stringmorphiform!(map) :: map()
+  @spec stringmorphiform!(map, list()) :: map()
   @spec compactify(map() | list()) :: {:ok, map()} | {:ok, list()} | {:error, %ArgumentError{}}
   @spec compactify!(map() | list()) :: map() | list() | %ArgumentError{}
   @spec compactiform!(map() | list()) :: map() | list() | %ArgumentError{}
@@ -256,6 +260,59 @@ defmodule Morphix do
   end
 
   @doc """
+
+  Takes a map as an argument and returns the same map with atom keys converted to string keys. Does not examine nested maps.
+
+  ### Examples
+
+  ```
+  iex> Morphix.stringmorphify!(%{this: "map", has: %{"string" => "keys"} })
+  %{"this" => "map", "has" => %{"string" => "keys"}}
+
+  iex> Morphix.stringmorphify!(%{1 => "2", "1" => 2, one: :two})
+  %{1 => "2", "1" => 2, "one" => :two}
+
+  ```
+  """
+  def stringmorphify!(map) when is_map(map) do
+    stringog(map, &binarize_atom/2)
+  end
+
+  @doc """
+  Takes a map and a list of allowed atoms as arguments and returns the same map, with any atoms that are in the list converted to strings, and any atoms that are not in the list left as atoms.
+
+
+  ### Examples:
+
+  ```
+  iex> map = %{memberof: "atoms", embeded: %{"wont" => "convert"}}
+  iex> Morphix.stringmorphify!(map, [:memberof])
+  %{:embeded => %{"wont" => "convert"}, "memberof" => "atoms"}
+
+  ```
+
+  ```
+  iex> map = %{id: "fooobarrr", date_of_birth: ~D[2014-04-14]}
+  iex> Morphix.stringmorphify!(map)
+  %{"id" => "fooobarrr", "date_of_birth" => ~D[2014-04-14]}
+  ```
+
+  """
+  def stringmorphify!(map, []) when is_map(map), do: map
+
+  def stringmorphify!(map, allowed) when is_map(map) and is_list(allowed) do
+    stringog(map, &binarize_atom/2, allowed)
+  end
+
+  def stringmorphify!(map, not_allowed) when is_map(map) do
+    raise(ArgumentError, message: "expecting a list of atoms, got: #{inspect(not_allowed)}")
+  end
+
+  def stringmorphify!(not_map, _) when not is_map(not_map) do
+    raise(ArgumentError, message: "expecting a map, got: #{inspect(not_map)}")
+  end
+
+  @doc """
   Takes a map as an argument and returns `{:ok, map}`, with all string keys (including keys in nested maps) converted to atom keys.
 
   ### Examples:
@@ -375,6 +432,80 @@ defmodule Morphix do
     depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
+  def stringmorphiform!(map) when is_map(map) do
+    srecurse(map, &stringify_all/2)
+  end
+
+  def stringmorphiform!(map, []) when is_map(map), do: map
+
+  def stringmorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
+    srecurse(map, &stringify_all/2, allowed)
+  end
+
+  def stringmorphiform!(map, not_allowed) when is_map(map) do
+    raise(ArgumentError, message: "expecting a list of atoms, got: #{inspect(not_allowed)}")
+  end
+
+  def stringmorphiform!(not_map, _) when not is_map(not_map) do
+    raise(ArgumentError, message: "expecting a map, got: #{inspect(not_map)}")
+  end
+
+  defp stringify_all(value, []) do
+    if is_atom(value) do
+      try do
+        to_string(value)
+      rescue
+        _ -> value
+      end
+    else
+      value
+    end
+  end
+
+  defp stringify_all(value, allowed) do
+    if is_atom(value) && Enum.member?(allowed, value) do
+      to_string(value)
+    else
+      value
+    end
+  end
+
+  defp sprocess_list_item(item, helper, allowed) do
+    cond do
+      is_map(item) -> srecurse(item, helper, allowed)
+      is_list(item) -> Enum.map(item, fn x -> sprocess_list_item(x, helper, allowed) end)
+      true -> item
+    end
+  end
+
+  defp srecurse(map, helper, allowed \\ []) do
+    stringkeys = fn {k, v}, acc ->
+      cond do
+        is_struct(v) ->
+          Map.put_new(acc, helper.(k, allowed), v)
+
+        is_map(v) ->
+          Map.put_new(
+            acc,
+            helper.(k, allowed),
+            srecurse(v, helper, allowed)
+          )
+
+        is_list(v) ->
+          Map.put_new(
+            acc,
+            helper.(k, allowed),
+            sprocess_list_item(v, helper, allowed)
+          )
+
+        true ->
+          Map.put_new(acc, helper.(k, allowed), v)
+      end
+    end
+
+    Enum.reduce(map, %{}, stringkeys)
+  end
+
   defp process_list_item(item, safe_or_atomize, allowed) do
     cond do
       is_map(item) -> depth_atomog(item, safe_or_atomize, allowed)
@@ -419,9 +550,33 @@ defmodule Morphix do
     Enum.reduce(map, %{}, atomkeys)
   end
 
+  defp stringog(map, binarize, allowed \\ []) do
+    stringkeys = fn {k, v}, acc ->
+      Map.put_new(acc, binarize.(k, allowed), v)
+    end
+
+    Enum.reduce(map, %{}, stringkeys)
+  end
+
   defp atomize_binary(value, []) do
     if is_binary(value) do
       String.to_atom(value)
+    else
+      value
+    end
+  end
+
+  defp binarize_atom(value, []) do
+    if is_atom(value) do
+      Atom.to_string(value)
+    else
+      value
+    end
+  end
+
+  defp binarize_atom(value, allowed) do
+    if is_atom(value) && Enum.member?(allowed, value) do
+      Atom.to_string(value)
     else
       value
     end

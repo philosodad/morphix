@@ -247,4 +247,87 @@ defmodule MorphixTest do
       assert Morphix.equalify?(123, 123) == true
     end
   end
+
+  describe "#strigmorphiphorm" do
+    test "stringmorphiphorm will work (all allowed)" do
+      time = DateTime.utc_now()
+
+      test_map = %{
+        :this => time,
+        :that => nil,
+        :the => "other",
+        :how => %{
+          heck: nil,
+          empty: %{empty: %{empty: %{}}, blank: nil, empte: %{sort: %{}, of: nil}}
+        }
+      }
+
+      expected_map = %{
+        "this" => time,
+        "that" => nil,
+        "the" => "other",
+        "how" => %{
+          "heck" => nil,
+          "empty" => %{
+            "empty" => %{"empty" => %{}},
+            "blank" => nil,
+            "empte" => %{"sort" => %{}, "of" => nil}
+          }
+        }
+      }
+
+      assert Morphix.stringmorphiform!(test_map) == expected_map
+    end
+
+    test "stringmorphiphorm will work (filtering allowed)" do
+      time = DateTime.utc_now()
+
+      test_map = %{
+        :this => time,
+        :that => nil,
+        :the => "other",
+        :how => %{
+          heck: nil,
+          empty: %{empty: %{empty: %{}}, blank: nil, empte: %{sort: %{}, of: nil}}
+        }
+      }
+
+      expected_map = %{
+        "this" => time,
+        "that" => nil,
+        "the" => "other",
+        "how" => %{
+          "heck" => nil,
+          :empty => %{blank: nil, empte: %{of: nil, sort: %{}}, empty: %{empty: %{}}}
+        }
+      }
+
+      assert Morphix.stringmorphiform!(test_map, [:this, :that, :the, :how, :heck]) ==
+               expected_map
+    end
+  end
+
+  test "stringmorphify! will throw appropriate ArgumentError" do
+    map = %{example: "atoms"}
+
+    assert_raise ArgumentError, "expecting a list of atoms, got: 1", fn ->
+      Morphix.stringmorphify!(map, 1)
+    end
+
+    assert_raise ArgumentError, "expecting a map, got: 1", fn ->
+      Morphix.stringmorphify!(1, [])
+    end
+  end
+
+  test "stringmorphiform! will throw appropriate ArgumentError" do
+    map = %{example: "atoms"}
+
+    assert_raise ArgumentError, "expecting a list of atoms, got: 1", fn ->
+      Morphix.stringmorphiform!(map, 1)
+    end
+
+    assert_raise ArgumentError, "expecting a map, got: 1", fn ->
+      Morphix.stringmorphiform!(1, [])
+    end
+  end
 end
