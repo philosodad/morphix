@@ -186,12 +186,12 @@ defmodule MorphixTest do
       assert Morphix.equaliform?([1, 2, [3, 4, 5]], [1, 2, [3, 5, 4]]) == true
 
       assert Morphix.equaliform?(%{a: [1, 2, 3], b: [1, 2, 3]}, %{a: [1, 2, 3], b: [3, 2, 1]}) ==
-               true
+      true
 
       assert Morphix.equaliform?(
-               {123, :ok, true, %{a: [4, 5, 6]}},
-               {true, :ok, 123, %{a: [5, 4, 6]}}
-             ) == true
+      {123, :ok, true, %{a: [4, 5, 6]}},
+      {true, :ok, 123, %{a: [5, 4, 6]}}
+      ) == true
     end
 
     test "will return false for unequal unordered elements with nested values", context do
@@ -225,26 +225,80 @@ defmodule MorphixTest do
       assert Morphix.equalify?([1, 2, [3, 4, 5]], [1, 2, [3, 5, 4]]) == false
 
       assert Morphix.equalify?(%{a: [1, 2, 3], b: [1, 2, 3]}, %{a: [1, 2, 3], b: [3, 2, 1]}) ==
-               false
+      false
 
       assert Morphix.equalify?(
-               {123, :ok, true, %{a: [4, 5, 6]}},
-               {true, :ok, 123, %{a: [5, 4, 6]}}
-             ) == false
+      {123, :ok, true, %{a: [4, 5, 6]}},
+      {true, :ok, 123, %{a: [5, 4, 6]}}
+      ) == false
     end
 
     test "returns true when elements are the same, regardless of order" do
       assert Morphix.equalify?([1, :three, "two", %{a: [4, 5, 6]}], [
-               1,
-               "two",
-               %{a: [4, 5, 6]},
-               :three
-             ]) == true
+        1,
+        "two",
+        %{a: [4, 5, 6]},
+        :three
+      ]) == true
 
       assert Morphix.equalify?(%{a: 1, c: :three, b: "two"}, %{b: "two", c: :three, a: 1}) == true
 
       assert Morphix.equalify?({:ok, true, 123}, {true, :ok, 123}) == true
       assert Morphix.equalify?(123, 123) == true
+    end
+  end
+  describe "#strigmorphiphorm" do
+    test "stringmorphiphorm will work (all allowed)" do
+      time = DateTime.utc_now()
+
+      test_map = %{
+        :this => time,
+        :that => nil,
+        :the => "other",
+        :how => %{
+          heck: nil,
+          empty: %{empty: %{empty: %{}}, blank: nil, empte: %{sort: %{}, of: nil}}
+        }
+      }
+
+      expected_map = %{
+        "this" => time,
+        "that" => nil,
+        "the" => "other",
+        "how" => %{
+          "heck" => nil,
+          "empty" => %{"empty" => %{"empty" => %{}}, "blank" => nil, "empte" => %{"sort" => %{}, "of"=> nil}}
+        }
+      }
+
+      assert Morphix.stringomorphiform!(test_map) == expected_map
+    end
+
+
+    test "stringmorphiphorm will work (filtering allowed)" do
+      time = DateTime.utc_now()
+
+      test_map = %{
+        :this => time,
+        :that => nil,
+        :the => "other",
+        :how => %{
+          heck: nil,
+          empty: %{empty: %{empty: %{}}, blank: nil, empte: %{sort: %{}, of: nil}}
+        }
+      }
+
+      expected_map = %{
+        "this" => time,
+        "that" => nil,
+        "the" => "other",
+        "how" => %{
+          "heck" => nil,
+          :empty => %{blank: nil, empte: %{of: nil, sort: %{}}, empty: %{empty: %{}}}
+        }
+      }
+
+      assert Morphix.stringomorphiform!(test_map, [:this,:that,:the, :how, :heck ]) == expected_map
     end
   end
 end
