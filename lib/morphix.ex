@@ -260,6 +260,51 @@ defmodule Morphix do
   end
 
   @doc """
+
+  Takes a map as an argument and returns the same map with atom keys converted to string keys. Does not examine nested maps.
+
+  ### Examples
+
+  ```
+  iex> Morphix.stringmorphify!(%{this: "map", has: %{"string" => "keys"} })
+  %{"this" => "map", "has" => %{"string" => "keys"}}
+
+  iex> Morphix.stringmorphify!(%{1 => "2", "1" => 2, one: :two})
+  %{1 => "2", "1" => 2, "one" => :two}
+
+  ```
+  """
+  def stringmorphify!(map) when is_map(map) do
+    stringog(map, &binarize_atom/2)
+  end
+
+  @doc """
+  Takes a map and a list of allowed atoms as arguments and returns the same map, with any atoms that are in the list converted to strings, and any atoms that are not in the list left as atoms.
+
+
+  ### Examples:
+
+  ```
+  iex> map = %{memberof: "atoms", embeded: %{"wont" => "convert"}}
+  iex> Morphix.stringmorphify!(map, [:memberof])
+  %{:embeded => %{"wont" => "convert"}, "memberof" => "atoms"}
+
+  ```
+
+  ```
+  iex> map = %{id: "fooobarrr", date_of_birth: ~D[2014-04-14]}
+  iex> Morphix.stringmorphify!(map)
+  %{"id" => "fooobarrr", "date_of_birth" => ~D[2014-04-14]}
+  ```
+
+  """
+  def stringmorphify!(map, []) when is_map(map), do: map
+
+  def stringmorphify!(map, allowed) when is_map(map) and is_list(allowed) do
+    stringog(map, &binarize_atom/2, allowed)
+  end
+
+  @doc """
   Takes a map as an argument and returns `{:ok, map}`, with all string keys (including keys in nested maps) converted to atom keys.
 
   ### Examples:
@@ -489,9 +534,33 @@ defmodule Morphix do
     Enum.reduce(map, %{}, atomkeys)
   end
 
+  defp stringog(map, binarize, allowed \\ []) do
+    stringkeys = fn {k, v}, acc ->
+      Map.put_new(acc, binarize.(k, allowed), v)
+    end
+
+    Enum.reduce(map, %{}, stringkeys)
+  end
+
   defp atomize_binary(value, []) do
     if is_binary(value) do
       String.to_atom(value)
+    else
+      value
+    end
+  end
+
+  defp binarize_atom(value, []) do
+    if is_atom(value) do
+      Atom.to_string(value)
+    else
+      value
+    end
+  end
+
+  defp binarize_atom(value, allowed) do
+    if is_atom(value) && Enum.member?(allowed, value) do
+      Atom.to_string(value)
     else
       value
     end
