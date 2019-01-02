@@ -82,6 +82,8 @@ defmodule Morphix do
   @spec atomorphify(map(), :safe) :: {:ok, map()}
   @spec atomorphify(map(), list()) :: {:ok, map()}
   @spec atomorphify!(map()) :: map()
+  @spec stringmorphify!(map()) :: map()
+  @spec stringmorphify!(map(), list()) :: map()
   @spec atomorphify!(map(), :safe) :: map()
   @spec atomorphify!(map(), list()) :: map()
   @spec atomorphiform(map()) :: {:ok, map()}
@@ -90,6 +92,8 @@ defmodule Morphix do
   @spec atomorphiform!(map()) :: map()
   @spec atomorphiform!(map(), :safe) :: map()
   @spec atomorphiform!(map(), list()) :: map()
+  @spec stringomorphiform!(map) :: map()
+  @spec stringomorphiform!(map, list()) :: map()
   @spec compactify(map() | list()) :: {:ok, map()} | {:ok, list()} | {:error, %ArgumentError{}}
   @spec compactify!(map() | list()) :: map() | list() | %ArgumentError{}
   @spec compactiform!(map() | list()) :: map() | list() | %ArgumentError{}
