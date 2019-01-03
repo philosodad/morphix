@@ -304,6 +304,10 @@ defmodule Morphix do
     stringog(map, &binarize_atom/2, allowed)
   end
 
+  def stringmorphify!(map, not_allowed) when is_map(map) do
+    raise(ArgumentError, message: "expecting a list of atoms, got: #{inspect(not_allowed)}")
+  end
+
   @doc """
   Takes a map as an argument and returns `{:ok, map}`, with all string keys (including keys in nested maps) converted to atom keys.
 

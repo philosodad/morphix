@@ -306,4 +306,12 @@ defmodule MorphixTest do
                expected_map
     end
   end
+
+  test "stringmorphify! will throw appropriate exceptions" do
+    map = %{example: "atoms"}
+
+    assert_raise ArgumentError, "expecting a list of atoms, got: 1", fn ->
+      Morphix.stringmorphify!(map, 1)
+    end
+  end
 end
