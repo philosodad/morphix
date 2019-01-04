@@ -308,6 +308,10 @@ defmodule Morphix do
     raise(ArgumentError, message: "expecting a list of atoms, got: #{inspect(not_allowed)}")
   end
 
+  def stringmorphify!(not_map, _) when not is_map(not_map) do
+    raise(ArgumentError, message: "expecting a map, got: #{inspect(not_map)}")
+  end
+
   @doc """
   Takes a map as an argument and returns `{:ok, map}`, with all string keys (including keys in nested maps) converted to atom keys.
 
@@ -436,6 +440,14 @@ defmodule Morphix do
 
   def stringomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
     srecurse(map, &stringify_all/2, allowed)
+  end
+
+  def stringomorphiform!(map, not_allowed) when is_map(map) do
+    raise(ArgumentError, message: "expecting a list of atoms, got: #{inspect(not_allowed)}")
+  end
+
+  def stringomorphiform!(not_map, _) when not is_map(not_map) do
+    raise(ArgumentError, message: "expecting a map, got: #{inspect(not_map)}")
   end
 
   defp stringify_all(value, []) do
