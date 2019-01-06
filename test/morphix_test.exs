@@ -276,7 +276,7 @@ defmodule MorphixTest do
         }
       }
 
-      assert Morphix.stringomorphiform!(test_map) == expected_map
+      assert Morphix.stringmorphiform!(test_map) == expected_map
     end
 
     test "stringmorphiphorm will work (filtering allowed)" do
@@ -302,7 +302,7 @@ defmodule MorphixTest do
         }
       }
 
-      assert Morphix.stringomorphiform!(test_map, [:this, :that, :the, :how, :heck]) ==
+      assert Morphix.stringmorphiform!(test_map, [:this, :that, :the, :how, :heck]) ==
                expected_map
     end
   end
@@ -319,15 +319,15 @@ defmodule MorphixTest do
     end
   end
 
-  test "stringomorphiform! will throw appropriate ArgumentError" do
+  test "stringmorphiform! will throw appropriate ArgumentError" do
     map = %{example: "atoms"}
 
     assert_raise ArgumentError, "expecting a list of atoms, got: 1", fn ->
-      Morphix.stringomorphiform!(map, 1)
+      Morphix.stringmorphiform!(map, 1)
     end
 
     assert_raise ArgumentError, "expecting a map, got: 1", fn ->
-      Morphix.stringomorphiform!(1, [])
+      Morphix.stringmorphiform!(1, [])
     end
   end
 end

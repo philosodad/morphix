@@ -92,8 +92,8 @@ defmodule Morphix do
   @spec atomorphiform!(map()) :: map()
   @spec atomorphiform!(map(), :safe) :: map()
   @spec atomorphiform!(map(), list()) :: map()
-  @spec stringomorphiform!(map) :: map()
-  @spec stringomorphiform!(map, list()) :: map()
+  @spec stringmorphiform!(map) :: map()
+  @spec stringmorphiform!(map, list()) :: map()
   @spec compactify(map() | list()) :: {:ok, map()} | {:ok, list()} | {:error, %ArgumentError{}}
   @spec compactify!(map() | list()) :: map() | list() | %ArgumentError{}
   @spec compactiform!(map() | list()) :: map() | list() | %ArgumentError{}
@@ -432,21 +432,21 @@ defmodule Morphix do
     depth_atomog(map, &safe_atomize_binary/2, allowed)
   end
 
-  def stringomorphiform!(map) when is_map(map) do
+  def stringmorphiform!(map) when is_map(map) do
     srecurse(map, &stringify_all/2)
   end
 
-  def stringomorphiform!(map, []) when is_map(map), do: map
+  def stringmorphiform!(map, []) when is_map(map), do: map
 
-  def stringomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
+  def stringmorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
     srecurse(map, &stringify_all/2, allowed)
   end
 
-  def stringomorphiform!(map, not_allowed) when is_map(map) do
+  def stringmorphiform!(map, not_allowed) when is_map(map) do
     raise(ArgumentError, message: "expecting a list of atoms, got: #{inspect(not_allowed)}")
   end
 
-  def stringomorphiform!(not_map, _) when not is_map(not_map) do
+  def stringmorphiform!(not_map, _) when not is_map(not_map) do
     raise(ArgumentError, message: "expecting a map, got: #{inspect(not_map)}")
   end
 
