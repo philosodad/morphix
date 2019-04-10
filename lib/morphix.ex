@@ -86,6 +86,7 @@ defmodule Morphix do
   @spec stringmorphify!(map(), list()) :: map()
   @spec atomorphify!(map(), :safe) :: map()
   @spec atomorphify!(map(), list()) :: map()
+  @spec morphiform!(map(), fun(), list()) :: map()
   @spec atomorphiform(map()) :: {:ok, map()}
   @spec atomorphiform(map(), :safe) :: {:ok, map()}
   @spec atomorphiform(map(), list()) :: {:ok, map()}
@@ -223,7 +224,7 @@ defmodule Morphix do
   ```
   """
   def atomorphify!(map) when is_map(map) do
-    atomog(map, &atomize_binary/2)
+    keymorphify!(map, &atomize_binary/2)
   end
 
   @doc """
@@ -239,7 +240,7 @@ defmodule Morphix do
   ```
   """
   def atomorphify!(map, :safe) when is_map(map) do
-    atomog(map, &safe_atomize_binary/2)
+    keymorphify!(map, &safe_atomize_binary/2)
   end
 
   @doc """
@@ -256,7 +257,7 @@ defmodule Morphix do
   def atomorphify!(map, []) when is_map(map), do: map
 
   def atomorphify!(map, allowed) when is_map(map) and is_list(allowed) do
-    atomog(map, &safe_atomize_binary/2, allowed)
+    keymorphify!(map, &safe_atomize_binary/2, allowed)
   end
 
   @doc """
@@ -275,7 +276,7 @@ defmodule Morphix do
   ```
   """
   def stringmorphify!(map) when is_map(map) do
-    stringog(map, &binarize_atom/2)
+    keymorphify!(map, &binarize_atom/2)
   end
 
   @doc """
@@ -301,7 +302,7 @@ defmodule Morphix do
   def stringmorphify!(map, []) when is_map(map), do: map
 
   def stringmorphify!(map, allowed) when is_map(map) and is_list(allowed) do
-    stringog(map, &binarize_atom/2, allowed)
+    keymorphify!(map, &binarize_atom/2, allowed)
   end
 
   def stringmorphify!(map, not_allowed) when is_map(map) do
@@ -382,7 +383,7 @@ defmodule Morphix do
   ```
   """
   def atomorphiform!(map) when is_map(map) do
-    depth_atomog(map, &atomize_binary/2)
+    morphiform!(map, &atomize_binary/2)
   end
 
   @doc """
@@ -401,7 +402,7 @@ defmodule Morphix do
   ```
   """
   def atomorphiform!(map, :safe) when is_map(map) do
-    depth_atomog(map, &safe_atomize_binary/2)
+    morphiform!(map, &safe_atomize_binary/2)
   end
 
   @doc """
@@ -429,17 +430,17 @@ defmodule Morphix do
   def atomorphiform!(map, []) when is_map(map), do: map
 
   def atomorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
-    depth_atomog(map, &safe_atomize_binary/2, allowed)
+    morphiform!(map, &safe_atomize_binary/2, allowed)
   end
 
   def stringmorphiform!(map) when is_map(map) do
-    srecurse(map, &stringify_all/2)
+    morphiform!(map, &stringify_all/2)
   end
 
   def stringmorphiform!(map, []) when is_map(map), do: map
 
   def stringmorphiform!(map, allowed) when is_map(map) and is_list(allowed) do
-    srecurse(map, &stringify_all/2, allowed)
+    morphiform!(map, &stringify_all/2, allowed)
   end
 
   def stringmorphiform!(map, not_allowed) when is_map(map) do
@@ -470,92 +471,62 @@ defmodule Morphix do
     end
   end
 
-  defp sprocess_list_item(item, helper, allowed) do
+  defp process_list_item(item, transformer, allowed) do
     cond do
-      is_map(item) -> srecurse(item, helper, allowed)
-      is_list(item) -> Enum.map(item, fn x -> sprocess_list_item(x, helper, allowed) end)
+      is_map(item) -> morphiform!(item, transformer, allowed)
+      is_list(item) -> Enum.map(item, fn x -> process_list_item(x, transformer, allowed) end)
       true -> item
     end
   end
 
-  defp srecurse(map, helper, allowed \\ []) do
-    stringkeys = fn {k, v}, acc ->
+  @doc """
+  Takes a map and a function as an argument and returns the same map, with all keys transformed by the function.(including keys in nested maps) converted to atom keys.
+
+  The function passed in must take two arguments, the key, and an allowed list.
+
+  ### Examples:
+
+  ```
+  iex> Morphix.morphiform!(%{"this" => %{"map" => %{"has" => "a", "nested" => "string", "for" =>  %{"a" => :key}}}, "the" =>  %{"other" => %{"map" => :does}},"as" => "well"}, fn key, [] -> String.upcase(key) end)
+  %{"THIS" => %{"MAP" => %{"HAS" => "a", "NESTED" => "string", "FOR" => %{"A" => :key}}}, "THE" => %{"OTHER" => %{"MAP" => :does}}, "AS" => "well"}
+
+  ```
+
+  """
+  def morphiform!(map, transformer, allowed \\ []) when is_map(map) do
+    morphkeys = fn {k, v}, acc ->
       cond do
         is_struct(v) ->
-          Map.put_new(acc, helper.(k, allowed), v)
+          Map.put_new(acc, transformer.(k, allowed), v)
 
         is_map(v) ->
           Map.put_new(
             acc,
-            helper.(k, allowed),
-            srecurse(v, helper, allowed)
+            transformer.(k, allowed),
+            morphiform!(v, transformer, allowed)
           )
 
         is_list(v) ->
           Map.put_new(
             acc,
-            helper.(k, allowed),
-            sprocess_list_item(v, helper, allowed)
+            transformer.(k, allowed),
+            process_list_item(v, transformer, allowed)
           )
 
         true ->
-          Map.put_new(acc, helper.(k, allowed), v)
+          Map.put_new(acc, transformer.(k, allowed), v)
       end
     end
 
-    Enum.reduce(map, %{}, stringkeys)
+    Enum.reduce(map, %{}, morphkeys)
   end
 
-  defp process_list_item(item, safe_or_atomize, allowed) do
-    cond do
-      is_map(item) -> depth_atomog(item, safe_or_atomize, allowed)
-      is_list(item) -> Enum.map(item, fn x -> process_list_item(x, safe_or_atomize, allowed) end)
-      true -> item
-    end
-  end
-
-  defp depth_atomog(map, safe_or_atomize, allowed \\ []) do
-    atomkeys = fn {k, v}, acc ->
-      cond do
-        is_struct(v) ->
-          Map.put_new(acc, safe_or_atomize.(k, allowed), v)
-
-        is_map(v) ->
-          Map.put_new(
-            acc,
-            safe_or_atomize.(k, allowed),
-            depth_atomog(v, safe_or_atomize, allowed)
-          )
-
-        is_list(v) ->
-          Map.put_new(
-            acc,
-            safe_or_atomize.(k, allowed),
-            process_list_item(v, safe_or_atomize, allowed)
-          )
-
-        true ->
-          Map.put_new(acc, safe_or_atomize.(k, allowed), v)
-      end
+  defp keymorphify!(map, transformer, allowed \\ []) do
+    morphkeys = fn {k, v}, acc ->
+      Map.put_new(acc, transformer.(k, allowed), v)
     end
 
-    Enum.reduce(map, %{}, atomkeys)
-  end
-
-  defp atomog(map, safe_or_atomize, allowed \\ []) do
-    atomkeys = fn {k, v}, acc ->
-      Map.put_new(acc, safe_or_atomize.(k, allowed), v)
-    end
-
-    Enum.reduce(map, %{}, atomkeys)
-  end
-
-  defp stringog(map, binarize, allowed \\ []) do
-    stringkeys = fn {k, v}, acc ->
-      Map.put_new(acc, binarize.(k, allowed), v)
-    end
-
-    Enum.reduce(map, %{}, stringkeys)
+    Enum.reduce(map, %{}, morphkeys)
   end
 
   defp atomize_binary(value, []) do

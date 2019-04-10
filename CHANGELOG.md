@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.7.0]
+### Added
+- added morphiform!
+
 ## [v0.6.0]
 ### Added
 - added stringmorphiform!
