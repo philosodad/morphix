@@ -859,5 +859,7 @@ defmodule Morphix do
     is_map(map) && not Map.has_key?(map, :__struct__) && Enum.empty?(map)
   end
 
-  defp is_struct(s), do: is_map(s) and Map.has_key?(s, :__struct__)
+  if !macro_exported?(Kernel, :is_struct, 1) do
+    defp is_struct(s), do: is_map(s) and Map.has_key?(s, :__struct__)
+  end
 end
