@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+## [v0.8.0]
+### Added
+- checks for Kernel.is_struct() for compatibility with Elixir 1.10+
 
 ## [v0.7.0]
 ### Added
