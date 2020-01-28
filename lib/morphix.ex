@@ -496,7 +496,7 @@ defmodule Morphix do
   def morphiform!(map, transformer, allowed \\ []) when is_map(map) do
     morphkeys = fn {k, v}, acc ->
       cond do
-        is_struct(v) ->
+        __MODULE__.is_struct(v) ->
           Map.put_new(acc, transformer.(k, allowed), v)
 
         is_map(v) ->
@@ -711,7 +711,7 @@ defmodule Morphix do
   def compactiform!(map) when is_map(map) do
     compactor = fn {k, v}, acc ->
       cond do
-        is_struct(v) -> Map.put_new(acc, k, v)
+        __MODULE__.is_struct(v) -> Map.put_new(acc, k, v)
         is_map(v) and Enum.empty?(v) -> acc
         is_map(v) or is_list(v) -> Map.put_new(acc, k, compactiform!(v))
         is_nil(v) -> acc
