@@ -19,7 +19,7 @@ defmodule Morphix.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :propcheck]]
   end
 
   defp package do
@@ -50,7 +50,8 @@ defmodule Morphix.Mixfile do
     [
       {:excoveralls, "~> 0.8", only: [:dev, :test]},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:credo, "~> 0.9.1", only: [:dev, :test]}
+      {:credo, "~> 0.9.1", only: [:dev, :test]},
+      {:propcheck, "~> 1.1", only: [:dev, :test]}
     ]
   end
 end
