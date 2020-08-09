@@ -16,12 +16,15 @@ defmodule PartiphifyTest do
   end
 
   # other properties: every item in original list is in partitions
-  property "every item in the original list is in the partitions" do
+  property "every item in the original list is in a partition" do
     forall {list, p} <- {list(), integer(1,10)} do
-      Morphix.partiphify!(list, p)
-      |> List.flatten()
-      |> Enum.sort()
-      |> Kernel.==(Enum.sort(list))
+      partitioned = Morphix.partiphify!(list, p)
+      Enum.reduce(list, true, fn i, acc ->
+        in_a_list = Enum.reduce(partitioned, false, fn part, acc ->
+          Enum.member?(part, i) || acc
+        end)
+        in_a_list && acc
+      end)
     end
   end
   # the sum of the length of the partitions is the length of the original
