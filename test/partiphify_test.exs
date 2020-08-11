@@ -2,11 +2,7 @@ defmodule PartiphifyTest do
   use ExUnit.Case
   use PropCheck
 
-  # we want a property test that:
-  # gets a list and an integer
-  # and checks that the function Morphix.partifify!(list l, integer n)
-  # returns a list of length n
-  # this checks the number of partitions return
+  # number of partitions should be correct
   property "number of partitions is correct" do
     forall {list, p} <- {list(), integer(1,10)} do
       # IO.inspect({Enum.count(list), p})
@@ -28,5 +24,13 @@ defmodule PartiphifyTest do
     end
   end
   # the sum of the length of the partitions is the length of the original
+  property "the sum of all partition lengths is the length of the original" do
+    forall {list, p} <- {list(), integer(1,10)} do
+      list
+      |> Morphix.partiphify!(p)
+      |> Enum.reduce(0, fn part, acc -> Enum.count(part) + acc end)
+      |> Kernel.==(Enum.count(list))
+    end
+  end
   # each partition is +-1 of every other partition
 end
