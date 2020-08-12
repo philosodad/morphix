@@ -23,14 +23,26 @@ defmodule PartiphifyTest do
       end)
     end
   end
+
   # the sum of the length of the partitions is the length of the original
   property "the sum of all partition lengths is the length of the original" do
     forall {list, p} <- {list(), integer(1,10)} do
       list
       |> Morphix.partiphify!(p)
-      |> Enum.reduce(0, fn part, acc -> Enum.count(part) + acc end)
+      |> Enum.map(fn part -> Enum.count(part) end)
+      |> Enum.sum()
       |> Kernel.==(Enum.count(list))
     end
   end
+
   # each partition is +-1 of every other partition
+  property "all partition counts are within one of all other partition counts" do
+    forall {list, p} <- {list(), integer(1,10)} do
+      {min, max} = list
+      |> Morphix.partiphify!(p)
+      |> Enum.map(fn part -> Enum.count(part) end)
+      |> Enum.min_max()
+      abs(max - min) <= 1
+    end
+  end
 end
