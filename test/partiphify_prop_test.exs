@@ -1,4 +1,4 @@
-defmodule PartiphifyTest do
+defmodule PartiphifyPropTest do
   use ExUnit.Case
   use PropCheck
 
