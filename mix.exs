@@ -18,8 +18,17 @@ defmodule Morphix.Mixfile do
   # Configuration for the OTP application
   #
   # Type `mix help compile.app` for more information
+
   def application do
-    [applications: [:logger, :propcheck]]
+    [applications: applications(Mix.env())]
+  end
+
+  defp applications(:test) do
+    applications(:default) ++ [:stream_data, :propcheck]
+  end
+
+  defp applications(_) do
+    [:logger]
   end
 
   defp package do
@@ -51,6 +60,7 @@ defmodule Morphix.Mixfile do
       {:excoveralls, "~> 0.8", only: [:dev, :test]},
       {:ex_doc, "~> 0.18", only: :dev},
       {:credo, "~> 0.9.1", only: [:dev, :test]},
+      {:stream_data, "~> 0.5.0", only: [:dev, :test]},
       {:propcheck, "~> 1.1", only: [:dev, :test]}
     ]
   end
