@@ -3,7 +3,6 @@ defmodule Morphix do
   Morphix provides convenience methods for dealing with Maps, Lists, and Tuples.
 
   `morphiflat/1` and `morphiflat!/1` flatten maps, discarding top level keys.
-
   ### Examples:
 
   ```
@@ -175,6 +174,8 @@ defmodule Morphix do
   """
   def atomorphify(map) when is_map(map) do
     {:ok, atomorphify!(map)}
+  rescue
+    e -> {:error, e}
   end
 
   @doc """
@@ -191,6 +192,8 @@ defmodule Morphix do
   """
   def atomorphify(map, :safe) when is_map(map) do
     {:ok, atomorphify!(map, :safe)}
+  rescue
+    e -> {:error, e}
   end
 
   @doc """
@@ -206,6 +209,8 @@ defmodule Morphix do
   """
   def atomorphify(map, allowed) when is_map(map) and is_list(allowed) do
     {:ok, atomorphify!(map, allowed)}
+  rescue
+    e -> {:error, e}
   end
 
   @doc """
@@ -364,8 +369,10 @@ defmodule Morphix do
 
   ```
   """
-  def atomorphiform(map, allowed) when is_map(map) do
+  def atomorphiform(map, allowed) when is_map(map) and is_list(allowed) do
     {:ok, atomorphiform!(map, allowed)}
+  rescue
+    e -> {:error, e}
   end
 
   @doc """
@@ -530,7 +537,7 @@ defmodule Morphix do
   end
 
   defp atomize_binary(value, []) do
-    if is_binary(value) do
+    if is_binary(value) && String.printable?(value) do
       String.to_atom(value)
     else
       value
@@ -566,6 +573,10 @@ defmodule Morphix do
   end
 
   defp safe_atomize_binary(value, allowed) do
+    if !Enum.all?(allowed, fn x -> is_binary(x) && String.printable?(x) end) do
+      raise %ArgumentError{message: "#{inspect(allowed)} contains members that are not Strings."}
+    end
+
     if is_binary(value) && Enum.member?(allowed, value) do
       String.to_atom(value)
     else

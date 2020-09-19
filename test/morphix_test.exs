@@ -70,8 +70,8 @@ defmodule MorphixTest do
     assert_raise(FunctionClauseError, fn -> Morphix.atomorphify("foo", ["foo", "bar"]) end)
   end
 
-  test "atomorphify will reject second parameter that is not a list or :safe" do
-    assert_raise(FunctionClauseError, fn -> Morphix.atomorphify(%{"foo" => "foo"}, :foo) end)
+  test "atomorphify! will reject second parameter that is not a list or :safe" do
+    assert_raise(FunctionClauseError, fn -> Morphix.atomorphify!(%{"foo" => "foo"}, :foo) end)
   end
 
   test "atomorphiform will reject non-map parameters" do
@@ -82,8 +82,18 @@ defmodule MorphixTest do
     assert_raise(FunctionClauseError, fn -> Morphix.atomorphiform(%{"foo" => "foo"}, :foo) end)
   end
 
-  test "atomorphify if the list has non-binary keys" do
-    assert {:ok, %{1 => "foo"}} == Morphix.atomorphify(%{1 => "foo"}, [1, 2])
+  test "atomorphify/2 if the list has non-string keys" do
+    assert {:error, %ArgumentError{message: "[1, 2] contains members that are not Strings."}} ==
+             Morphix.atomorphify(%{1 => "foo"}, [1, 2])
+
+    assert {:error,
+            %ArgumentError{message: "[<<255>>, \"1\"] contains members that are not Strings."}} ==
+             Morphix.atomorphify(%{1 => "foo"}, [<<255>>, "1"])
+  end
+
+  test "atomorphify/1 if the map has non-printable binary keys" do
+    assert {:ok, %{:a => "a", <<255>> => "b"}} ==
+             Morphix.atomorphify(%{<<255>> => "b", "a" => "a"})
   end
 
   test "atomorphiform will handle lists of nested maps" do
@@ -104,6 +114,15 @@ defmodule MorphixTest do
     }
 
     assert Morphix.atomorphiform(test_map) == {:ok, expected_map}
+  end
+
+  test "atomorphiform/2 if the list has non-string keys" do
+    assert {:error, %ArgumentError{message: "[1, 2] contains members that are not Strings."}} ==
+             Morphix.atomorphiform(%{1 => "foo"}, [1, 2])
+
+    assert {:error,
+            %ArgumentError{message: "[<<255>>, \"1\"] contains members that are not Strings."}} ==
+             Morphix.atomorphiform(%{1 => "foo"}, [<<255>>, "1"])
   end
 
   test "compactiform will ignore structs" do
