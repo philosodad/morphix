@@ -49,7 +49,7 @@ defmodule Morphix.Mixfile do
   defp deps do
     [
       {:excoveralls, "~> 0.8", only: [:dev, :test]},
-      {:ex_doc, "~> 0.18", only: :dev},
+      {:ex_doc, "~> 0.19", only: :dev},
       {:credo, "~> 0.9.1", only: [:dev, :test]}
     ]
   end
