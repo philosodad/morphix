@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+## [v0.8.1] 2020-09-21
+### Fixed
+- Binary keys causing crashes in the atomorphif* family of methods. (Issue #24)
+
+### Removed
+- Support for Elixir versions before 1.7.4
+
 ## [v0.8.0]
 ### Added
 - checks for Kernel.is_struct() for compatibility with Elixir 1.10+
