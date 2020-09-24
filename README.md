@@ -13,7 +13,7 @@ The package can be installed from hex.pm
 
 1. Add morphix to your list of dependencies in `mix.exs`:
 
-    ```
+    ```elixir
     def deps do
       [{:morphix, "~> 0.8.0"}]
     end
