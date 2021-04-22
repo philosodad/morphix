@@ -1,19 +1,18 @@
 defmodule Util.EqualityOperator do
   @moduledoc """
-  The `equalif*` method is designed to allow for unorderd equality comparison between lists. In an ordered comparison, `[1,2,3]` is not considered equal to `[3,2,1]`, but `equali/fy?|form?` would consider those two lists to be equal. 
+  The `equalif*` method is designed to allow for unorderd equality comparison between lists.
+
+  In an ordered comparison, `[1,2,3]` is not considered equal to `[3,2,1]`, but `equali/fy?|form?` would consider those two lists to be equal.
 
   `equalify|equaliform?` will accept inputs other than maps, tuples, or lists:
 
-  ###Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.equaliform?(1,1)
-  true
+      iex> Morphix.equaliform?(1,1)
+      true
 
-  iex> Morphix.equaliform?(DateTime.utc_now(), DateTime.utc_now())
-  false
-
-  ```
+      iex> Morphix.equaliform?(DateTime.utc_now(), DateTime.utc_now())
+      false
 
   But it is designed for situations where you have two Enumerables, and you want to see if they have the same elements.
   """
@@ -24,16 +23,14 @@ defmodule Util.EqualityOperator do
       Takes two elements and returns `true` if they are equal, ignoring order for Enumerables.
       Order is also ignored for nested Enumerables.
 
-      ### Examples:
+      ### Examples
 
-      ```
-      iex> Morphix.equaliform?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [["two", :three], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
-      true
+          iex> Morphix.equaliform?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [["two", :three], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
+          true
 
-      iex> Morphix.equaliform?([1, "two", :three, %{a: 1, c: "three", e: %{g: 4, b: 2}}], ["two", :three, 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
-      false
+          iex> Morphix.equaliform?([1, "two", :three, %{a: 1, c: "three", e: %{g: 4, b: 2}}], ["two", :three, 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
+          false
 
-      ```
       """
 
       @spec equaliform?(any(), any()) :: boolean
@@ -52,16 +49,14 @@ defmodule Util.EqualityOperator do
       Takes two elements and returns `true` if they are equal, ignoring order for Enumerables.
       Order is not ignored for nested Enumerables.
 
-      ### Examples:
+      ### Examples
 
-      ```
-      iex> Morphix.equalify?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [["two", :three], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
-      true
+          iex> Morphix.equalify?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [["two", :three], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
+          true
 
-      iex> Morphix.equalify?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [[:three, "two"], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
-      false
+          iex> Morphix.equalify?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [[:three, "two"], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
+          false
 
-      ```
       """
 
       @spec equalify?(any(), any()) :: boolean
