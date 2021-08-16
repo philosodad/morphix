@@ -3,36 +3,28 @@ defmodule Morphix do
   Morphix provides convenience methods for dealing with Maps, Lists, and Tuples.
 
   `morphiflat/1` and `morphiflat!/1` flatten maps, discarding top level keys.
-  ### Examples:
 
-  ```
-  iex> Morphix.morphiflat %{flatten: %{this: "map"}, if: "you please"}
-  {:ok, %{this: "map", if: "you please"}}
+  ### Examples
 
-  iex> Morphix.morphiflat! %{flatten: %{this: "map"}, o: "k"}
-  %{this: "map", o: "k"}
+      iex> Morphix.morphiflat %{flatten: %{this: "map"}, if: "you please"}
+      {:ok, %{this: "map", if: "you please"}}
 
-  ```
+      iex> Morphix.morphiflat! %{flatten: %{this: "map"}, o: "k"}
+      %{this: "map", o: "k"}
 
   `morphify!/2` and `morphify/2` will take either a List or a Tuple as the first argument, and a function as the second. Returns a map, with the keys of the map being the function applied to each member of the input.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.morphify!({[1,2,3], [12], [1,2,3,4]}, &length/1)
-  %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}
-
-  ```
+      iex> Morphix.morphify!({[1,2,3], [12], [1,2,3,4]}, &length/1)
+      %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}
 
   `atomorphify/1` and `atomorphiform/1` take a map as an input and return the map with all string keys converted to atoms. `atomorphiform/1` is recursive. `atomorphiform/2` and `atomormiphify/2` take `:safe` as a second argument, they will not convert string keys if the resulting atom has not been defined.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.atomorphify(%{"a" => "2", :a => 2, 'a'  => :two})
-  {:ok, %{:a => 2, 'a' => :two }}
-
-  ```
+      iex> Morphix.atomorphify(%{"a" => "2", :a => 2, 'a'  => :two})
+      {:ok, %{:a => 2, 'a' => :two }}
 
   `compactify` and `compactiform` take a map or list as an input and returns a filtered map or list, removing any keys or elements with nil values or with an empty map as a value.
 
@@ -40,30 +32,29 @@ defmodule Morphix do
 
   ### Examples:
 
-  ```
-  iex> Morphix.partiphify!([:a, :b, :c, :d, :e, :f], 4)
-  [[:c], [:d], [:e, :a], [:f, :b]]
+      iex> Morphix.partiphify!([:a, :b, :c, :d, :e, :f], 4)
+      [[:c], [:d], [:e, :a], [:f, :b]]
 
-  iex> Morphix.partiphify!([:a, :b, :c, :d, :e], 4)
-  [[:b], [:c], [:d], [:e, :a]]
+      iex> Morphix.partiphify!([:a, :b, :c, :d, :e], 4)
+      [[:b], [:c], [:d], [:e, :a]]
 
-  iex> Morphix.partiphify!([:a, :b, :c, :d], 4)
-  [[:a], [:b], [:c], [:d]]
+      iex> Morphix.partiphify!([:a, :b, :c, :d], 4)
+      [[:a], [:b], [:c], [:d]]
 
-  iex> Morphix.partiphify!([:a, :b, :c], 4)
-  [[:a], [:b], [:c], []]
-
-  ```
+      iex> Morphix.partiphify!([:a, :b, :c], 4)
+      [[:a], [:b], [:c], []]
 
   `equaliform?/2` compares two ordered or unordered lists and returns `true` if they are equal. It also handles nested elements.
 
-  ### Example:
+  ### Examples
+
       iex> Morphix.equaliform?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [[:three, "two"], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
       true
 
   `equalify?/2` compares two ordered or unordered lists and returns `true` if they are equal.
 
-  ### Example:
+  ### Example
+
       iex> Morphix.equalify?([1, ["two", :three], %{a: 1, c: "three", e: %{d: 4, b: 2}}], [["two", :three], 1, %{c: "three", a: 1, e: %{b: 2, d: 4}}])
       true
 
@@ -104,13 +95,11 @@ defmodule Morphix do
   @doc """
   Takes a map and returns a flattend version of that map, discarding any nested keys.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.morphiflat! %{you: "will", youwill: %{be: "discarded"}}
-  %{you: "will", be: "discarded"}
+      iex> Morphix.morphiflat! %{you: "will", youwill: %{be: "discarded"}}
+      %{you: "will", be: "discarded"}
 
-  ```
   """
   def morphiflat!(map) do
     flattn(map)
@@ -119,24 +108,20 @@ defmodule Morphix do
   @doc """
   Takes a map and returns a flattened version of that map. If the map has nested maps (or the maps nested maps have nested maps, etc.) morphiflat moves all nested key/value pairs to the top level, discarding the original keys.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.morphiflat %{this: %{nested: :map, inner: %{twonested: :map, is: "now flat"}}}
-  {:ok, %{nested: :map, twonested: :map, is: "now flat"}}
-
-  ```
+      iex> Morphix.morphiflat %{this: %{nested: :map, inner: %{twonested: :map, is: "now flat"}}}
+      {:ok, %{nested: :map, twonested: :map, is: "now flat"}}
 
   In the example, the key `:this` is discarded, along with the key `inner`, because they both point to map values.
 
   Will return `{:error, <input> is not a Map}` if the input is not a map.
 
-  ### Examples:
-  ```
-  iex> Morphix.morphiflat({1,2,3})
-  {:error, "{1, 2, 3} is not a Map"}
+  ### Examples
 
-  ```
+      iex> Morphix.morphiflat({1,2,3})
+      {:error, "{1, 2, 3} is not a Map"}
+
   """
   def morphiflat(map) when is_map(map) do
     {:ok, flattn(map)}
@@ -163,14 +148,12 @@ defmodule Morphix do
 
   ### Examples
 
-  ```
-  iex> Morphix.atomorphify(%{"this" => "map", "has" => %{"string" => "keys"}})
-  {:ok, %{this: "map", has: %{"string" => "keys"}}}
+      iex> Morphix.atomorphify(%{"this" => "map", "has" => %{"string" => "keys"}})
+      {:ok, %{this: "map", has: %{"string" => "keys"}}}
 
-  iex> Morphix.atomorphify(%{1 => "2", "1" => 2, "one" => :two})
-  {:ok, %{1 => "2", "1": 2, one: :two}}
+      iex> Morphix.atomorphify(%{1 => "2", "1" => 2, "one" => :two})
+      {:ok, %{1 => "2", "1": 2, one: :two}}
 
-  ```
   """
   def atomorphify(map) when is_map(map) do
     {:ok, atomorphify!(map)}
@@ -181,14 +164,12 @@ defmodule Morphix do
   @doc """
   Takes a map and the `:safe` flag and returns `{:ok, map}`, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> :existing_atom
-  iex> Morphix.atomorphify(%{"existing_atom" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, :safe)
-  {:ok, %{ "non_existent_atom" => "does_not", 1 => "is_ignored", existing_atom: "exists"}}
+      iex> :existing_atom
+      iex> Morphix.atomorphify(%{"existing_atom" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, :safe)
+      {:ok, %{ "non_existent_atom" => "does_not", 1 => "is_ignored", existing_atom: "exists"}}
 
-  ```
   """
   def atomorphify(map, :safe) when is_map(map) do
     {:ok, atomorphify!(map, :safe)}
@@ -199,13 +180,11 @@ defmodule Morphix do
   @doc """
   Takes a map and a list of allowed strings to convert to atoms and returns `{:ok, map}`, with string keys in the list converted to atoms. Ignores nested maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.atomorphify(%{"allowed_key" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_key"])
-  {:ok, %{ "non_existent_atom" => "does_not", 1 => "is_ignored", allowed_key: "exists"}}
+      iex> Morphix.atomorphify(%{"allowed_key" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_key"])
+      {:ok, %{ "non_existent_atom" => "does_not", 1 => "is_ignored", allowed_key: "exists"}}
 
-  ```
   """
   def atomorphify(map, allowed) when is_map(map) and is_list(allowed) do
     {:ok, atomorphify!(map, allowed)}
@@ -219,14 +198,12 @@ defmodule Morphix do
 
   ### Examples
 
-  ```
-  iex> Morphix.atomorphify!(%{"this" => "map", "has" => %{"string" => "keys"}})
-  %{this: "map", has: %{"string" => "keys"}}
+      iex> Morphix.atomorphify!(%{"this" => "map", "has" => %{"string" => "keys"}})
+      %{this: "map", has: %{"string" => "keys"}}
 
-  iex> Morphix.atomorphify!(%{1 => "2", "1" => 2, "one" => :two})
-  %{1 => "2", "1": 2, one: :two}
+      iex> Morphix.atomorphify!(%{1 => "2", "1" => 2, "one" => :two})
+      %{1 => "2", "1": 2, one: :two}
 
-  ```
   """
   def atomorphify!(map) when is_map(map) do
     keymorphify!(map, &atomize_binary/2)
@@ -235,14 +212,12 @@ defmodule Morphix do
   @doc """
   Takes a map and the `:safe` flag and returns the same map, with string keys converted to existing atoms if possible, and ignored otherwise. Ignores nested maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> :existing_atom
-  iex> Morphix.atomorphify!(%{"existing_atom" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, :safe)
-  %{"non_existent_atom" => "does_not", 1 => "is_ignored", existing_atom: "exists"}
+      iex> :existing_atom
+      iex> Morphix.atomorphify!(%{"existing_atom" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, :safe)
+      %{"non_existent_atom" => "does_not", 1 => "is_ignored", existing_atom: "exists"}
 
-  ```
   """
   def atomorphify!(map, :safe) when is_map(map) do
     keymorphify!(map, &safe_atomize_binary/2)
@@ -251,13 +226,11 @@ defmodule Morphix do
   @doc """
   Takes a map and a list of allowed strings to convert to atoms and returns the same map, with string keys in the list converted to atoms. Ignores nested maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.atomorphify!(%{"allowed_key" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_key"])
-  %{"non_existent_atom" => "does_not", 1 => "is_ignored", allowed_key: "exists"}
+      iex> Morphix.atomorphify!(%{"allowed_key" => "exists", "non_existent_atom" => "does_not", 1 => "is_ignored"}, ["allowed_key"])
+      %{"non_existent_atom" => "does_not", 1 => "is_ignored", allowed_key: "exists"}
 
-  ```
   """
   def atomorphify!(map, []) when is_map(map), do: map
 
@@ -271,14 +244,12 @@ defmodule Morphix do
 
   ### Examples
 
-  ```
-  iex> Morphix.stringmorphify!(%{this: "map", has: %{"string" => "keys"} })
-  %{"this" => "map", "has" => %{"string" => "keys"}}
+      iex> Morphix.stringmorphify!(%{this: "map", has: %{"string" => "keys"} })
+      %{"this" => "map", "has" => %{"string" => "keys"}}
 
-  iex> Morphix.stringmorphify!(%{1 => "2", "1" => 2, one: :two})
-  %{1 => "2", "1" => 2, "one" => :two}
+      iex> Morphix.stringmorphify!(%{1 => "2", "1" => 2, one: :two})
+      %{1 => "2", "1" => 2, "one" => :two}
 
-  ```
   """
   def stringmorphify!(map) when is_map(map) do
     keymorphify!(map, &binarize_atom/2)
@@ -288,20 +259,15 @@ defmodule Morphix do
   Takes a map and a list of allowed atoms as arguments and returns the same map, with any atoms that are in the list converted to strings, and any atoms that are not in the list left as atoms.
 
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> map = %{memberof: "atoms", embeded: %{"wont" => "convert"}}
-  iex> Morphix.stringmorphify!(map, [:memberof])
-  %{:embeded => %{"wont" => "convert"}, "memberof" => "atoms"}
+      iex> map = %{memberof: "atoms", embeded: %{"wont" => "convert"}}
+      iex> Morphix.stringmorphify!(map, [:memberof])
+      %{:embeded => %{"wont" => "convert"}, "memberof" => "atoms"}
 
-  ```
-
-  ```
-  iex> map = %{id: "fooobarrr", date_of_birth: ~D[2014-04-14]}
-  iex> Morphix.stringmorphify!(map)
-  %{"id" => "fooobarrr", "date_of_birth" => ~D[2014-04-14]}
-  ```
+      iex> map = %{id: "fooobarrr", date_of_birth: ~D[2014-04-14]}
+      iex> Morphix.stringmorphify!(map)
+      %{"id" => "fooobarrr", "date_of_birth" => ~D[2014-04-14]}
 
   """
   def stringmorphify!(map, []) when is_map(map), do: map
@@ -321,16 +287,14 @@ defmodule Morphix do
   @doc """
   Takes a map as an argument and returns `{:ok, map}`, with all string keys (including keys in nested maps) converted to atom keys.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.atomorphiform(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
-  {:ok,%{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"} }
+      iex> Morphix.atomorphiform(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
+      {:ok,%{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"} }
 
-  iex> Morphix.atomorphiform(%{"this" => ["map", %{"has" => ["a", "list"]}], "inside" => "it"})
-  {:ok, %{this: ["map", %{has: ["a", "list"]}], inside: "it"}}
+      iex> Morphix.atomorphiform(%{"this" => ["map", %{"has" => ["a", "list"]}], "inside" => "it"})
+      {:ok, %{this: ["map", %{has: ["a", "list"]}], inside: "it"}}
 
-  ```
   """
   def atomorphiform(map) when is_map(map) do
     {:ok, atomorphiform!(map)}
@@ -341,15 +305,13 @@ defmodule Morphix do
 
   Works recursively on embedded maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> [:allowed, :values]
-  iex> map = %{"allowed" => "atoms", "embed" => %{"will" => "convert", "values" => "to atoms"}}
-  iex> Morphix.atomorphiform(map, :safe)
-  {:ok, %{"embed" => %{"will" => "convert", values: "to atoms"}, allowed: "atoms"}}
+      iex> [:allowed, :values]
+      iex> map = %{"allowed" => "atoms", "embed" => %{"will" => "convert", "values" => "to atoms"}}
+      iex> Morphix.atomorphiform(map, :safe)
+      {:ok, %{"embed" => %{"will" => "convert", values: "to atoms"}, allowed: "atoms"}}
 
-  ```
   """
   def atomorphiform(map, :safe) when is_map(map) do
     {:ok, atomorphiform!(map, :safe)}
@@ -360,14 +322,12 @@ defmodule Morphix do
 
   Works recursively on embedded maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> map = %{"memberof" => "atoms", "embed" => %{"will" => "convert", "thelist" => "to atoms"}}
-  iex> Morphix.atomorphiform(map, ["memberof", "thelist"])
-  {:ok, %{"embed" => %{"will" => "convert", thelist: "to atoms"}, memberof: "atoms"}}
+      iex> map = %{"memberof" => "atoms", "embed" => %{"will" => "convert", "thelist" => "to atoms"}}
+      iex> Morphix.atomorphiform(map, ["memberof", "thelist"])
+      {:ok, %{"embed" => %{"will" => "convert", thelist: "to atoms"}, memberof: "atoms"}}
 
-  ```
   """
   def atomorphiform(map, allowed) when is_map(map) and is_list(allowed) do
     {:ok, atomorphiform!(map, allowed)}
@@ -378,16 +338,14 @@ defmodule Morphix do
   @doc """
   Takes a map as an argument and returns the same map, with all string keys (including keys in nested maps) converted to atom keys.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.atomorphiform!(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
-  %{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"}
+      iex> Morphix.atomorphiform!(%{:this => %{map: %{"has" => "a", :nested => "string", :for =>  %{a: :key}}}, "the" =>  %{"other" => %{map: :does}}, as: "well"})
+      %{this: %{map: %{has: "a", nested: "string", for: %{a: :key}}}, the: %{other: %{map: :does}}, as: "well"}
 
-  iex> Morphix.atomorphiform!(%{"this" => ["map", %{"has" => ["a", "list"]}], "inside" => "it"})
-  %{this: ["map", %{has: ["a", "list"]}], inside: "it"}
+      iex> Morphix.atomorphiform!(%{"this" => ["map", %{"has" => ["a", "list"]}], "inside" => "it"})
+      %{this: ["map", %{has: ["a", "list"]}], inside: "it"}
 
-  ```
   """
   def atomorphiform!(map) when is_map(map) do
     morphiform!(map, &atomize_binary/2)
@@ -398,15 +356,13 @@ defmodule Morphix do
 
   Works recursively on embedded maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> [:allowed, :values]
-  iex> map = %{"allowed" => "atoms", "embed" => %{"will" => "convert", "values" => "to atoms"}}
-  iex> Morphix.atomorphiform!(map, :safe)
-  %{"embed" => %{"will" => "convert", values: "to atoms"}, allowed: "atoms"}
+      iex> [:allowed, :values]
+      iex> map = %{"allowed" => "atoms", "embed" => %{"will" => "convert", "values" => "to atoms"}}
+      iex> Morphix.atomorphiform!(map, :safe)
+      %{"embed" => %{"will" => "convert", values: "to atoms"}, allowed: "atoms"}
 
-  ```
   """
   def atomorphiform!(map, :safe) when is_map(map) do
     morphiform!(map, &safe_atomize_binary/2)
@@ -417,21 +373,16 @@ defmodule Morphix do
 
   Works recursively on embedded maps.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> map = %{"memberof" => "atoms", "embed" => %{"will" => "convert", "thelist" => "to atoms"}}
-  iex> Morphix.atomorphiform!(map, ["memberof", "thelist"])
-  %{"embed" => %{"will" => "convert", thelist: "to atoms"}, memberof: "atoms"}
+      iex> map = %{"memberof" => "atoms", "embed" => %{"will" => "convert", "thelist" => "to atoms"}}
+      iex> Morphix.atomorphiform!(map, ["memberof", "thelist"])
+      %{"embed" => %{"will" => "convert", thelist: "to atoms"}, memberof: "atoms"}
 
-  ```
-
-  ```
-  iex> map = %{"id" => "fooobarrr", "date_of_birth" => ~D[2014-04-14]}
-  %{"date_of_birth" => ~D[2014-04-14], "id" => "fooobarrr"}
-  iex> Morphix.atomorphiform!(map)
-  %{id: "fooobarrr", date_of_birth: ~D[2014-04-14]}
-  ```
+      iex> map = %{"id" => "fooobarrr", "date_of_birth" => ~D[2014-04-14]}
+      %{"date_of_birth" => ~D[2014-04-14], "id" => "fooobarrr"}
+      iex> Morphix.atomorphiform!(map)
+      %{id: "fooobarrr", date_of_birth: ~D[2014-04-14]}
 
   """
   def atomorphiform!(map, []) when is_map(map), do: map
@@ -491,13 +442,10 @@ defmodule Morphix do
 
   The function passed in must take two arguments, the key, and an allowed list.
 
-  ### Examples:
+  ### Examples
 
-  ```
-  iex> Morphix.morphiform!(%{"this" => %{"map" => %{"has" => "a", "nested" => "string", "for" =>  %{"a" => :key}}}, "the" =>  %{"other" => %{"map" => :does}},"as" => "well"}, fn key, [] -> String.upcase(key) end)
-  %{"THIS" => %{"MAP" => %{"HAS" => "a", "NESTED" => "string", "FOR" => %{"A" => :key}}}, "THE" => %{"OTHER" => %{"MAP" => :does}}, "AS" => "well"}
-
-  ```
+      iex> Morphix.morphiform!(%{"this" => %{"map" => %{"has" => "a", "nested" => "string", "for" =>  %{"a" => :key}}}, "the" =>  %{"other" => %{"map" => :does}},"as" => "well"}, fn key, [] -> String.upcase(key) end)
+      %{"THIS" => %{"MAP" => %{"HAS" => "a", "NESTED" => "string", "FOR" => %{"A" => :key}}}, "THE" => %{"OTHER" => %{"MAP" => :does}}, "AS" => "well"}
 
   """
   def morphiform!(map, transformer, allowed \\ []) when is_map(map) do
@@ -590,17 +538,16 @@ defmodule Morphix do
   If the function cannot be applied, will return `{:error, message}`
 
   ### Examples
-  ```
-  iex> Morphix.morphify([[1,2,3], [12], [1,2,3,4]], &Enum.count/1)
-  {:ok, %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}}
 
-  iex> Morphix.morphify({[1,2,3], [12], [1,2,3,4]}, &length/1)
-  {:ok, %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}}
+      iex> Morphix.morphify([[1,2,3], [12], [1,2,3,4]], &Enum.count/1)
+      {:ok, %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}}
 
-  iex> Morphix.morphify([1,2], &String.length/1)
-  {:error, "Unable to apply &String.length/1 to each of [1, 2]"}
+      iex> Morphix.morphify({[1,2,3], [12], [1,2,3,4]}, &length/1)
+      {:ok, %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}}
 
-  ```
+      iex> Morphix.morphify([1,2], &String.length/1)
+      {:error, "Unable to apply &String.length/1 to each of [1, 2]"}
+
   """
   def morphify(enum, funct) when is_tuple(enum), do: morphify(Tuple.to_list(enum), funct)
 
@@ -614,11 +561,10 @@ defmodule Morphix do
   Takes a list and a function as arguments and returns a Map, with the keys of the map the result of applying the function to each item in the list.
 
   ### Examples
-  ```
-  iex> Morphix.morphify!([[1,2,3], [12], [1,2,3,4]], &Enum.count/1)
-  %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}
 
-  ```
+      iex> Morphix.morphify!([[1,2,3], [12], [1,2,3,4]], &Enum.count/1)
+      %{1 => [12], 3 => [1,2,3], 4 => [1,2,3,4]}
+
   """
   def morphify!(enum, funct) when is_tuple(enum), do: morphify!(Tuple.to_list(enum), funct)
 
@@ -630,23 +576,22 @@ defmodule Morphix do
   Takes a map or list and removes keys or elements that have nil values, or are empty maps.
 
   ### Examples
-  ```
-  iex> Morphix.compactify!(%{nil_key: nil, not_nil: "nil"})
-  %{not_nil: "nil"}
 
-  iex> Morphix.compactify!([1, nil, "string", %{key: :value}])
-  [1, "string", %{key: :value}]
+      iex> Morphix.compactify!(%{nil_key: nil, not_nil: "nil"})
+      %{not_nil: "nil"}
 
-  iex> Morphix.compactify!([a: nil, b: 2, c: "string"])
-  [b: 2, c: "string"]
+      iex> Morphix.compactify!([1, nil, "string", %{key: :value}])
+      [1, "string", %{key: :value}]
 
-  iex> Morphix.compactify!(%{empty: %{}, not: "not"})
-  %{not: "not"}
+      iex> Morphix.compactify!([a: nil, b: 2, c: "string"])
+      [b: 2, c: "string"]
 
-  iex> Morphix.compactify!({"not", "a map"})
-  ** (ArgumentError) expecting a map or a list, got: {"not", "a map"}
+      iex> Morphix.compactify!(%{empty: %{}, not: "not"})
+      %{not: "not"}
 
-  ```
+      iex> Morphix.compactify!({"not", "a map"})
+      ** (ArgumentError) expecting a map or a list, got: {"not", "a map"}
+
   """
 
   def compactify!(map) when is_map(map) do
@@ -677,23 +622,22 @@ defmodule Morphix do
   Takes a map or a list and removes any keys or elements that have nil values.
 
   ### Examples
-  ```
-  iex> Morphix.compactify(%{nil_key: nil, not_nil: "real value"})
-  {:ok, %{not_nil: "real value"}}
 
-  iex> Morphix.compactify([1, nil, "string", %{key: :value}])
-  {:ok, [1, "string", %{key: :value}]}
+      iex> Morphix.compactify(%{nil_key: nil, not_nil: "real value"})
+      {:ok, %{not_nil: "real value"}}
 
-  iex> Morphix.compactify([a: nil, b: 2, c: "string"])
-  {:ok, [b: 2, c: "string"]}
+      iex> Morphix.compactify([1, nil, "string", %{key: :value}])
+      {:ok, [1, "string", %{key: :value}]}
 
-  iex> Morphix.compactify(%{empty: %{}, not: "not"})
-  {:ok, %{not: "not"}}
+      iex> Morphix.compactify([a: nil, b: 2, c: "string"])
+      {:ok, [b: 2, c: "string"]}
 
-  iex> Morphix.compactify("won't work")
-  {:error, %ArgumentError{message: "expecting a map or a list, got: \\"won't work\\""}}
+      iex> Morphix.compactify(%{empty: %{}, not: "not"})
+      {:ok, %{not: "not"}}
 
-  ```
+      iex> Morphix.compactify("won't work")
+      {:error, %ArgumentError{message: "expecting a map or a list, got: \\"won't work\\""}}
+
   """
 
   def compactify(map_or_list) do
@@ -706,17 +650,16 @@ defmodule Morphix do
   Removes keys with nil values from nested maps, eliminates empty maps, and removes nil values from nested lists.
 
   ### Examples
-  ```
-  iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other"}})
-  %{not_nil: "a value", nested: %{other: "other"}}
 
-  iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}})
-  %{not_nil: "a value", nested: %{other: "other"}}
+      iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other"}})
+      %{not_nil: "a value", nested: %{other: "other"}}
 
-  iex> Morphix.compactiform!([nil, "string", %{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}}, ["nested", nil, 2]])
-  ["string", %{not_nil: "a value", nested: %{other: "other"}}, ["nested", 2]]
+      iex> Morphix.compactiform!(%{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}})
+      %{not_nil: "a value", nested: %{other: "other"}}
 
-  ```
+      iex> Morphix.compactiform!([nil, "string", %{nil_nil: nil, not_nil: "a value", nested: %{nil_val: nil, other: "other", nested_empty: %{}}}, ["nested", nil, 2]])
+      ["string", %{not_nil: "a value", nested: %{other: "other"}}, ["nested", 2]]
+
   """
 
   def compactiform!(map) when is_map(map) do
@@ -758,20 +701,19 @@ defmodule Morphix do
   Removes keys with nil values from maps and nil elements from lists. It also handles nested maps and lists, and treats empty maps as nil values.
 
   ### Examples
-  ```
-  iex> Morphix.compactiform(%{a: nil, b: "not", c: %{d: nil, e: %{}, f: %{g: "value"}}})
-  {:ok, %{b: "not", c: %{f: %{g: "value"}}}}
 
-  iex> Morphix.compactiform(%{has: %{a: ["list", "with", nil]}, and: ["a", %{nested: "map", with: nil}]})
-  {:ok, %{has: %{a: ["list", "with"]}, and: ["a", %{nested: "map"}]}}
+      iex> Morphix.compactiform(%{a: nil, b: "not", c: %{d: nil, e: %{}, f: %{g: "value"}}})
+      {:ok, %{b: "not", c: %{f: %{g: "value"}}}}
 
-  iex> Morphix.compactiform(["list", %{a: "map", with: nil, and_empty: []}])
-  {:ok, ["list", %{a: "map", and_empty: []}]}
+      iex> Morphix.compactiform(%{has: %{a: ["list", "with", nil]}, and: ["a", %{nested: "map", with: nil}]})
+      {:ok, %{has: %{a: ["list", "with"]}, and: ["a", %{nested: "map"}]}}
 
-  iex> Morphix.compactiform(5)
-  {:error, %ArgumentError{message: "expecting a map or a list, got: 5"}}
+      iex> Morphix.compactiform(["list", %{a: "map", with: nil, and_empty: []}])
+      {:ok, ["list", %{a: "map", and_empty: []}]}
 
-  ```
+      iex> Morphix.compactiform(5)
+      {:error, %ArgumentError{message: "expecting a map or a list, got: 5"}}
+
   """
   def compactiform(map) do
     {:ok, compactiform!(map)}
@@ -783,14 +725,13 @@ defmodule Morphix do
   Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible
 
   ### Examples
-  ```
-  iex> Morphix.partiphify!([1,2,3,4,5,6], 4)
-  [[3], [4], [5, 1], [6, 2]]
 
-  iex> Morphix.partiphify!(("abcdefghijklmnop" |> String.split("", trim: true)), 4)
-  [["a", "b", "c", "d"], ["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"]]
+      iex> Morphix.partiphify!([1,2,3,4,5,6], 4)
+      [[3], [4], [5, 1], [6, 2]]
 
-  ```
+      iex> Morphix.partiphify!(("abcdefghijklmnop" |> String.split("", trim: true)), 4)
+      [["a", "b", "c", "d"], ["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"]]
+
   """
   def partiphify!(list, k) when is_list(list) and is_integer(k) do
     ceil_div = fn a, b -> Float.ceil(a / b) end
@@ -834,13 +775,13 @@ defmodule Morphix do
   Divides a list into k distinct sub-lists, with partitions being as close to the same size as possible
 
   ### Examples
-  ```
-  iex> Morphix.partiphify([1,2,3,4,5,6], 4)
-  {:ok, [[3], [4], [5, 1], [6, 2]]}
 
-  iex> Morphix.partiphify(("abcdefghijklmnop" |> String.split("", trim: true)), 4)
-  {:ok, [["a", "b", "c", "d"], ["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"]]}
-  ```
+      iex> Morphix.partiphify([1,2,3,4,5,6], 4)
+      {:ok, [[3], [4], [5, 1], [6, 2]]}
+
+      iex> Morphix.partiphify(("abcdefghijklmnop" |> String.split("", trim: true)), 4)
+      {:ok, [["a", "b", "c", "d"], ["e", "f", "g", "h"], ["i", "j", "k", "l"], ["m", "n", "o", "p"]]}
+
   """
   def partiphify(list, k) do
     {:ok, partiphify!(list, k)}
