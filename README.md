@@ -1,6 +1,5 @@
 # Morphix
 
-[![Travis](https://img.shields.io/travis/philosodad/morphix.svg)](https://travis-ci.org/philosodad/morphix)
 [![Coveralls](https://img.shields.io/coveralls/philosodad/morphix.svg)](https://coveralls.io/github/philosodad/morphix)
 [![Module Version](https://img.shields.io/hexpm/v/morphix.svg)](https://hex.pm/packages/morphix)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/morphix/)
